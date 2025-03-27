@@ -5,10 +5,13 @@
     - citirea blog posturilor, studiilor?
 - User:
     - guest
-    - trackuirea antrenamenteloor, greutatii, caloriilor
+    - trackuirea antrenamenteloor, greutatii, caloriilor cu niste grafice
     - vizualizarea videoclipurilor pentru exercitii
     - -crearea de blog posts
     - poate cereri de prietenie intre users si crearea de grupuri
+    - leadboards
+    - vizualizarea volumului, reps, etc pentru o saptamana/luna/an
+    - 
 - Admin:
     - stergerea, adaugarea si modificarea(poate si subscriptii) utilizatorilor
     - stergerea blog posturilor
@@ -30,4 +33,3 @@
 
 ### Aditionale
 - Poate creare de rol antrenor personal si users sa poata comunica cu antrenori personali?
-- 
