@@ -23,12 +23,12 @@
 - Frontend: 
     - React
 - Backend:
+    - Node + Express + Nest Next?
     - FastApi
     - Django
-    - Node + Express
 - Database:
-    - MySql
     - PostgreSql
+    - MySql
 
 
 ### Aditionale
