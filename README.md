@@ -24,11 +24,11 @@
 
 ## Stack
 - Frontend: 
-    - React + Chart
+    - React + Vite + Chart + Tailwind
 - Backend:
     - Node + Express
 - Database:
-    - Mongo
+    - MySql
 
 ### Aditionale
 - Poate creare de rol antrenor personal si users sa poata comunica cu antrenori personali?
