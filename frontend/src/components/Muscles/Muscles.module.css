@@ -1,0 +1,57 @@
+/* src/components/Muscles/Muscles.module.css */
+
+/* Base style for all muscle paths - applied via JS or directly in SVG */
+.muscle {
+  fill: #d1d5db; /* gray-300 */
+  fill-opacity: 0.5;
+  stroke: #6b7280; /* gray-500 */
+  stroke-width: 0.5;
+  transition: fill-opacity 0.2s ease-in-out, fill 0.2s ease-in-out, stroke 0.2s ease-in-out, stroke-width 0.2s ease-in-out;
+  /* Default cursor only for non-enabled */
+}
+
+/* Style for muscles that have exercises available */
+.enabled {
+  fill: #93c5fd; /* blue-300 */
+  fill-opacity: 0.6;
+  cursor: pointer; /* Make only enabled muscles clickable */
+}
+.enabled:hover {
+   fill: #60a5fa; /* blue-400 */
+   fill-opacity: 0.8;
+}
+
+
+/* Style for muscles that are currently hovered over (if enabled) */
+/* The JS toggles this class */
+.hover {
+  fill: #60a5fa; /* blue-400 */
+  fill-opacity: 0.9;
+  stroke: #3b82f6; /* blue-500 */
+  stroke-width: 1;
+}
+
+/* Style for muscles that are currently selected/active */
+.active {
+  fill: #ef4444; /* red-500 */
+  fill-opacity: 0.9;
+  stroke: #b91c1c; /* red-700 */
+  stroke-width: 1;
+}
+
+/* Base illustration style */
+.illustration {
+  max-width: 400px; /* Control max size */
+  height: auto;
+  display: block;
+  margin-left: auto; /* Center it if needed */
+  margin-right: auto;
+}
+
+/* Style for the main body outline path if needed */
+/* Example: If path14 is the outline */
+/* #path14 {
+  fill: #f3f4f6; /* gray-100 */
+/* stroke: #1f2937; /* gray-800 */
+/* stroke-width: 1;
+/* } */
