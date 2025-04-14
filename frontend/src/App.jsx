@@ -11,14 +11,17 @@ import RegisterPage from './pages/RegisterPage';
 import InteractiveExercisesPage from './pages/InteractiveExercisesPage';
 import DashboardPage from './pages/DashboardPage';
 import LogMealPage from './pages/LogMealPage';
+import TrackWeightPage from './pages/TrackWeightPage';
+import SettingsPage from './pages/SettingsPage';
+import TrackCaloriesPage from './pages/TrackCaloriesPage';
 
 // Placeholders for new pages linked in the sidebar
 const LogWorkoutPage = () => <div className="p-4 bg-white rounded-lg shadow">Log Workout Page Content</div>;
-const TrackWeightPage = () => <div className="p-4 bg-white rounded-lg shadow">Track Weight Page Content</div>;
-const TrackCaloriesPage = () => <div className="p-4 bg-white rounded-lg shadow">Track Calories Page Content</div>;
+//const TrackWeightPage = () => <div className="p-4 bg-white rounded-lg shadow">Track Weight Page Content</div>;
+//const TrackCaloriesPage = () => <div className="p-4 bg-white rounded-lg shadow">Track Calories Page Content</div>;
 //const LogMealPage = () => <div className="p-4 bg-white rounded-lg shadow">Log Meal Page Content</div>;
 const WorkoutPlansPage = () => <div className="p-4 bg-white rounded-lg shadow">Workout Plans Page Content</div>;
-const SettingsPage = () => <div className="p-4 bg-white rounded-lg shadow">Settings Page Content</div>;
+//const SettingsPage = () => <div className="p-4 bg-white rounded-lg shadow">Settings Page Content</div>;
 const ActivityLogPage = () => <div className="p-4 bg-white rounded-lg shadow">Activity Log Page Content</div>;
 
 // Other placeholders
