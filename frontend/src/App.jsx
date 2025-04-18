@@ -20,6 +20,8 @@ import WorkoutPlansPage from './pages/WorkoutPlansPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminExercisesPage from './pages/AdminExercisesPage';
 import CalculatorsPage from './pages/CalculatorsPage';
+import RecipesPage from './pages/RecipesPage';
+import RecipeDetailPage from './pages/RecipesDetailPage';
 
 // Placeholders for new pages linked in the sidebar
 //const LogWorkoutPage = () => <div className="p-4 bg-white rounded-lg shadow">Log Workout Page Content</div>;
@@ -59,6 +61,8 @@ function App() {
         <Route path="/activity-log" element={<ActivityLogPage />} />
         <Route path="/calculators" element={<CalculatorsPage />} /> {/* <-- Add Calculators Route */}
         {/* Add other routes like profile, etc. here */}
+        <Route path="/recipes" element={<RecipesPage />} />
+        <Route path="/recipes/:recipeId" element={<RecipeDetailPage />} />
       </Route>
 
       {/* --- Admin Routes --- */}

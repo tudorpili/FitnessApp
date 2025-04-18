@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Outlet, NavLink, Link } from 'react-router-dom';
 import {
   FiGrid, FiActivity, FiBarChart2, FiCoffee, FiTarget, FiClipboard,
-  FiMenu, FiX, FiSettings} from 'react-icons/fi';
-  import { FaCalculator } from 'react-icons/fa';
+  FiMenu, FiX, FiSettings, FiBookOpen,FiZap // <-- Added BookOpen icon
+} from 'react-icons/fi';
+import { FaCalculator } from 'react-icons/fa';
 
 function AppLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -24,12 +25,14 @@ function AppLayout() {
         <NavLink to="/track-calories" className={navLinkClass} onClick={() => setIsSidebarOpen(false)}> <FiTarget className="mr-3 h-5 w-5 flex-shrink-0" /> <span className="truncate">Track Calories</span> </NavLink>
         <NavLink to="/log-meal" className={navLinkClass} onClick={() => setIsSidebarOpen(false)}> <FiCoffee className="mr-3 h-5 w-5 flex-shrink-0" /> <span className="truncate">Log Meal</span> </NavLink>
         <NavLink to="/exercises" className={navLinkClass} onClick={() => setIsSidebarOpen(false)}> <FiClipboard className="mr-3 h-5 w-5 flex-shrink-0" /> <span className="truncate">Exercises</span> </NavLink>
-        {/* --- NEW: Calculators Link --- */}
-        <NavLink to="/calculators" className={navLinkClass} onClick={() => setIsSidebarOpen(false)}>
-            <FaCalculator className="mr-3 h-5 w-5 flex-shrink-0" />
-            <span className="truncate">Calculators</span>
+        <NavLink to="/workout-plans" className={navLinkClass} onClick={() => setIsSidebarOpen(false)}> <FiZap className="mr-3 h-5 w-5 flex-shrink-0" /> <span className="truncate">Workout Plans</span> </NavLink> {/* Assuming FiZap was for plans */}
+        <NavLink to="/calculators" className={navLinkClass} onClick={() => setIsSidebarOpen(false)}> <FaCalculator className="mr-3 h-5 w-5 flex-shrink-0" /> <span className="truncate">Calculators</span> </NavLink>
+        {/* --- NEW: Recipes Link --- */}
+        <NavLink to="/recipes" className={navLinkClass} onClick={() => setIsSidebarOpen(false)}>
+            <FiBookOpen className="mr-3 h-5 w-5 flex-shrink-0" />
+            <span className="truncate">Recipes</span>
         </NavLink>
-         {/* --- END NEW --- */}
+        {/* --- END NEW --- */}
         <div className="pt-4 mt-4 border-t border-gray-200">
              <NavLink to="/settings" className={navLinkClass} onClick={() => setIsSidebarOpen(false)}> <FiSettings className="mr-3 h-5 w-5 flex-shrink-0" /> <span className="truncate">Settings</span> </NavLink>
              <NavLink to="/login" className={navLinkClass} onClick={() => setIsSidebarOpen(false)}> <FiClipboard className="mr-3 h-5 w-5 flex-shrink-0" /> <span className="truncate">Back to Login</span> </NavLink>
