@@ -1,16 +1,16 @@
 // src/pages/AdminExercisesPage.jsx
 import React, { useState, useMemo, useEffect } from 'react';
-import { mockExercises } from '../mockData/exercises'; // Import base mock data
+import { mockExercises } from '../mockData/exercises';
 import {
     FiClipboard, FiPlus, FiEdit, FiTrash2, FiSearch, FiX, FiSave,
     FiAlertTriangle, FiImage, FiVideo, FiType, FiBarChart2, FiTag,
     FiAlertCircle, FiArrowUp, FiArrowDown, FiList, FiPlayCircle
 } from 'react-icons/fi';
 
-// Helper Functions
-//const getTodayDate = () => { const today = new Date(); const year = today.getFullYear(); const month = String(today.getMonth() + 1).padStart(2, '0'); const day = String(today.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`; };
-//const getInitials = (name = '') => { /* ... */ return '?'; };
-//const getColorForName = (name = '') => { /* ... */ return 'bg-gray-100 text-gray-800'; };
+// --- Helper Functions ---
+// const getTodayDate = () => { /* ... */ }; // Not used here
+// const getInitials = (name = '') => { /* ... */ }; // Not used here
+// const getColorForName = (name = '') => { /* ... */ }; // Not used here
 
 // --- Reusable Card Component ---
 const InfoCard = ({ title, children, className = '', icon }) => ( /* ... Card JSX ... */
@@ -18,46 +18,14 @@ const InfoCard = ({ title, children, className = '', icon }) => ( /* ... Card JS
 );
 
 // --- Add/Edit Exercise Modal Component ---
-const ExerciseFormModal = ({ isOpen, onClose, onSubmit, initialData }) => {
+const ExerciseFormModal = ({ isOpen, onClose, onSubmit, initialData }) => { /* ... Modal JSX and Logic ... */
     const [name, setName] = useState(''); const [description, setDescription] = useState(''); const [muscle, setMuscle] = useState(''); const [difficulty, setDifficulty] = useState('Beginner'); const [equipment, setEquipment] = useState(''); const [image, setImage] = useState(''); const [videoUrl, setVideoUrl] = useState(''); const [formError, setFormError] = useState(''); const isEditMode = useMemo(() => !!initialData, [initialData]);
     useEffect(() => { if (isOpen) { if (isEditMode) { setName(initialData.name || ''); setDescription(initialData.description || ''); setMuscle(initialData.muscle || ''); setDifficulty(initialData.difficulty || 'Beginner'); setEquipment(initialData.equipment || ''); setImage(initialData.image || ''); const firstVideo = Array.isArray(initialData.videos) && initialData.videos.length > 0 ? initialData.videos[0].url : (typeof initialData.video_url === 'string' ? initialData.video_url : ''); setVideoUrl(firstVideo); } else { setName(''); setDescription(''); setMuscle(''); setDifficulty('Beginner'); setEquipment(''); setImage(''); setVideoUrl(''); } setFormError(''); } }, [isOpen, initialData, isEditMode]);
     const handleSubmit = (e) => { e.preventDefault(); setFormError(''); if (!name.trim() || !muscle.trim()) { setFormError('Exercise Name and Target Muscle are required.'); return; } const exerciseData = { name, description, muscle, difficulty, equipment, image, videos: videoUrl ? [{ view: 'Main', url: videoUrl }] : [] }; const submissionError = onSubmit(exerciseData, initialData?.id); if (submissionError) { setFormError(submissionError); } else { onClose(); } };
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const muscleGroups = useMemo(() => [...new Set(mockExercises.map(ex => ex?.muscle).filter(Boolean))], []);
     if (!isOpen) return null;
-    return (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300" onClick={onClose}>
-            <div className="bg-gradient-to-br from-white via-slate-50/90 to-white/90 backdrop-blur-lg rounded-2xl shadow-2xl shadow-slate-500/10 p-6 sm:p-8 w-full max-w-2xl border border-white/20 animate-modalEnter max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-                <div className="flex justify-between items-center mb-6 pb-3 border-b border-slate-200/80"> <h3 className="text-xl font-semibold text-slate-800 tracking-tight">{isEditMode ? 'Edit Exercise' : 'Add New Exercise'}</h3> <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors"><FiX size={24} /></button> </div>
-                <form onSubmit={handleSubmit} className="space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
-                        {/* Form inputs... */}
-                        <div className="md:col-span-2"><label htmlFor="ex-name" className="block text-sm font-medium text-slate-700 mb-1">Name *</label><input type="text" id="ex-name" value={name} onChange={(e) => setName(e.target.value)} required className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"/></div>
-                        <div><label htmlFor="ex-muscle" className="block text-sm font-medium text-slate-700 mb-1">Target Muscle *</label><select id="ex-muscle" value={muscle} onChange={(e) => setMuscle(e.target.value)} required className="w-full px-4 py-2.5 border border-slate-300 bg-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"><option value="" disabled>Select muscle...</option>{muscleGroups.sort().map(m => <option key={m} value={m}>{m}</option>)}</select></div>
-                        <div><label htmlFor="ex-difficulty" className="block text-sm font-medium text-slate-700 mb-1">Difficulty</label><select id="ex-difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="w-full px-4 py-2.5 border border-slate-300 bg-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div>
-                        <div className="md:col-span-2"><label htmlFor="ex-equipment" className="block text-sm font-medium text-slate-700 mb-1">Equipment <span className="text-xs text-gray-400">(Optional)</span></label><input type="text" id="ex-equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} placeholder="e.g., Barbell, Dumbbells, Bench" className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"/></div>
-                        <div className="md:col-span-2"><label htmlFor="ex-description" className="block text-sm font-medium text-slate-700 mb-1">Description <span className="text-xs text-gray-400">(Optional)</span></label><textarea id="ex-description" value={description} onChange={(e) => setDescription(e.target.value)} rows="3" placeholder="How to perform the exercise..." className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"></textarea></div>
-                        <div><label htmlFor="ex-image" className="block text-sm font-medium text-slate-700 mb-1">Image URL <span className="text-xs text-gray-400">(Optional)</span></label><input type="url" id="ex-image" value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://..." className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"/></div>
-                        {/* --- MODIFIED: Changed type="url" to type="text" --- */}
-                        <div>
-                            <label htmlFor="ex-video" className="block text-sm font-medium text-slate-700 mb-1">Video URL <span className="text-xs text-gray-400">(Optional)</span></label>
-                            <input
-                                type="text" // <-- Changed from "url" to "text"
-                                id="ex-video"
-                                value={videoUrl}
-                                onChange={(e) => setVideoUrl(e.target.value)}
-                                placeholder="https://... or /videos/local.mp4"
-                                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"
-                            />
-                        </div>
-                        {/* --- END MODIFICATION --- */}
-                    </div>
-                    {formError && ( <p className="mt-4 text-sm text-red-600 flex items-center"><FiAlertCircle className="mr-1 h-4 w-4"/> {formError}</p> )}
-                    <div className="flex justify-end gap-4 pt-5"> <button type="button" onClick={onClose} className="px-5 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-100 transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400">Cancel</button> <button type="submit" className="flex items-center px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 shadow-md hover:shadow-lg transform hover:scale-[1.02]"> <FiSave className="mr-1.5"/> {isEditMode ? 'Save Changes' : 'Add Exercise'} </button> </div>
-                </form>
-            </div>
-        </div>
-    );
+    return ( <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-opacity duration-300" onClick={onClose}> <div className="bg-gradient-to-br from-white via-slate-50/90 to-white/90 backdrop-blur-lg rounded-2xl shadow-2xl shadow-slate-500/10 p-6 sm:p-8 w-full max-w-2xl border border-white/20 animate-modalEnter max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}> <div className="flex justify-between items-center mb-6 pb-3 border-b border-slate-200/80"> <h3 className="text-xl font-semibold text-slate-800 tracking-tight">{isEditMode ? 'Edit Exercise' : 'Add New Exercise'}</h3> <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors"><FiX size={24} /></button> </div> <form onSubmit={handleSubmit} className="space-y-5"> <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">{/* Form inputs... */} <div className="md:col-span-2"><label htmlFor="ex-name" className="block text-sm font-medium text-slate-700 mb-1">Name *</label><input type="text" id="ex-name" value={name} onChange={(e) => setName(e.target.value)} required className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"/></div> <div><label htmlFor="ex-muscle" className="block text-sm font-medium text-slate-700 mb-1">Target Muscle *</label><select id="ex-muscle" value={muscle} onChange={(e) => setMuscle(e.target.value)} required className="w-full px-4 py-2.5 border border-slate-300 bg-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"><option value="" disabled>Select muscle...</option>{muscleGroups.sort().map(m => <option key={m} value={m}>{m}</option>)}</select></div> <div><label htmlFor="ex-difficulty" className="block text-sm font-medium text-slate-700 mb-1">Difficulty</label><select id="ex-difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className="w-full px-4 py-2.5 border border-slate-300 bg-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></div> <div className="md:col-span-2"><label htmlFor="ex-equipment" className="block text-sm font-medium text-slate-700 mb-1">Equipment <span className="text-xs text-gray-400">(Optional)</span></label><input type="text" id="ex-equipment" value={equipment} onChange={(e) => setEquipment(e.target.value)} placeholder="e.g., Barbell, Dumbbells, Bench" className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"/></div> <div className="md:col-span-2"><label htmlFor="ex-description" className="block text-sm font-medium text-slate-700 mb-1">Description <span className="text-xs text-gray-400">(Optional)</span></label><textarea id="ex-description" value={description} onChange={(e) => setDescription(e.target.value)} rows="3" placeholder="How to perform the exercise..." className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"></textarea></div> <div><label htmlFor="ex-image" className="block text-sm font-medium text-slate-700 mb-1">Image URL <span className="text-xs text-gray-400">(Optional)</span></label><input type="url" id="ex-image" value={image} onChange={(e) => setImage(e.target.value)} placeholder="https://..." className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"/></div> <div><label htmlFor="ex-video" className="block text-sm font-medium text-slate-700 mb-1">Video URL <span className="text-xs text-gray-400">(Optional)</span></label><input type="text" id="ex-video" value={videoUrl} onChange={(e) => setVideoUrl(e.target.value)} placeholder="https://... or /videos/local.mp4" className="w-full px-4 py-2.5 border border-slate-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 bg-white/80"/></div> </div> {formError && ( <p className="mt-4 text-sm text-red-600 flex items-center"><FiAlertCircle className="mr-1 h-4 w-4"/> {formError}</p> )} <div className="flex justify-end gap-4 pt-5"> <button type="button" onClick={onClose} className="px-5 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-100 transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400">Cancel</button> <button type="submit" className="flex items-center px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 shadow-md hover:shadow-lg transform hover:scale-[1.02]"> <FiSave className="mr-1.5"/> {isEditMode ? 'Save Changes' : 'Add Exercise'} </button> </div> </form> </div> </div> );
 };
 
 // --- Delete Confirmation Modal Component ---
@@ -76,7 +44,6 @@ const VideoPlaybackModal = ({ isOpen, onClose, exerciseName, videos = [] }) => {
 
 // --- Main AdminExercisesPage Component ---
 function AdminExercisesPage() {
-    // ... State variables ...
     const [exercises, setExercises] = useState(mockExercises);
     const [searchTerm, setSearchTerm] = useState('');
     const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
@@ -135,10 +102,31 @@ function AdminExercisesPage() {
                                     <th scope="col" className="px-6 py-3.5 text-center text-xs font-bold text-slate-600 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white/80 divide-y divide-slate-200/50">
-                                {/* Table Body mapping sortedAndFilteredExercises */}
-                                {sortedAndFilteredExercises.map((exercise) => { const hasVideos = exercise.videos && Array.isArray(exercise.videos) && exercise.videos.length > 0; return ( <tr key={exercise.id} className="hover:bg-indigo-50/30 transition-colors duration-150"> <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">{exercise.name}</td> <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{exercise.muscle || '-'}</td> <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full shadow-sm ${ exercise.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' : exercise.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' : exercise.difficulty === 'Advanced' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800' }`}>{exercise.difficulty || 'N/A'}</span></td> <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{exercise.equipment || '-'}</td> <td className="px-6 py-4 whitespace-nowrap text-center"><button onClick={() => handleOpenVideoModal(exercise)} disabled={!hasVideos} title={hasVideos ? "Watch Video" : "No Video Available"} className={`p-2 rounded-lg transition-all duration-150 transform hover:scale-110 ${hasVideos ? 'text-emerald-600 hover:bg-emerald-100/80' : 'text-gray-300 cursor-not-allowed'}`}><FiPlayCircle className="h-4 w-4" /></button></td> <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><div className="flex justify-center items-center space-x-2"><button onClick={() => handleOpenEditModal(exercise)} title="Edit Exercise" className="p-2 text-blue-600 hover:bg-blue-100/80 rounded-lg transition-all duration-150 transform hover:scale-110"><FiEdit className="h-4 w-4" /></button><button onClick={() => handleOpenDeleteModal(exercise)} title="Delete Exercise" className="p-2 text-red-600 hover:bg-red-100/80 rounded-lg transition-all duration-150 transform hover:scale-110"><FiTrash2 className="h-4 w-4" /></button></div></td> </tr> ); })} {sortedAndFilteredExercises.length === 0 && ( <tr><td colSpan="6" className="px-6 py-10 text-center text-sm text-gray-500 italic">{searchTerm ? 'No exercises match your search.' : 'No exercises found.'}</td></tr> )}
-                            </tbody>
+                             {/* --- MODIFIED TBODY to remove potential whitespace --- */}
+                            <tbody className="bg-white/80 divide-y divide-slate-200/50">{/* Start mapping immediately */}
+                                {sortedAndFilteredExercises.map((exercise) => {
+                                    const hasVideos = exercise.videos && Array.isArray(exercise.videos) && exercise.videos.length > 0;
+                                    // Return the TR directly from the map function
+                                    return (
+                                        <tr key={exercise.id} className="hover:bg-indigo-50/30 transition-colors duration-150">{/* Start TR immediately */}
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">{exercise.name}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-600">{exercise.muscle || '-'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap"><span className={`px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full shadow-sm ${ exercise.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' : exercise.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' : exercise.difficulty === 'Advanced' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800' }`}>{exercise.difficulty || 'N/A'}</span></td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{exercise.equipment || '-'}</td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-center"><button onClick={() => handleOpenVideoModal(exercise)} disabled={!hasVideos} title={hasVideos ? "Watch Video" : "No Video Available"} className={`p-2 rounded-lg transition-all duration-150 transform hover:scale-110 ${hasVideos ? 'text-emerald-600 hover:bg-emerald-100/80' : 'text-gray-300 cursor-not-allowed'}`}><FiPlayCircle className="h-4 w-4" /></button></td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium"><div className="flex justify-center items-center space-x-2"><button onClick={() => handleOpenEditModal(exercise)} title="Edit Exercise" className="p-2 text-blue-600 hover:bg-blue-100/80 rounded-lg transition-all duration-150 transform hover:scale-110"><FiEdit className="h-4 w-4" /></button><button onClick={() => handleOpenDeleteModal(exercise)} title="Delete Exercise" className="p-2 text-red-600 hover:bg-red-100/80 rounded-lg transition-all duration-150 transform hover:scale-110"><FiTrash2 className="h-4 w-4" /></button></div></td>
+                                        </tr>
+                                    );
+                                })}
+                                {/* Conditional rendering for 'No results' row */}
+                                {sortedAndFilteredExercises.length === 0 && (
+                                    <tr>{/* Start TR immediately */}
+                                        <td colSpan="6" className="px-6 py-10 text-center text-sm text-gray-500 italic">
+                                            {searchTerm ? 'No exercises match your search.' : 'No exercises found.'}
+                                        </td>{/* End TD immediately */}
+                                    </tr>
+                                )}
+                            </tbody>{/* End TBODY immediately */}
                         </table>
                     </div>
                 </InfoCard>

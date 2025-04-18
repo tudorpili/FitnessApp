@@ -2,86 +2,84 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-// Layout Component
-import AppLayout from './components/layout/AppLayout'; // Import the layout
-import AdminLayout from './components/layout/AdminLayout';
+// Layouts & Auth
+import AppLayout from './components/layout/AppLayout.jsx'; // Use .jsx
+import AdminLayout from './components/layout/AdminLayout.jsx'; // Use .jsx
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx'; // <-- Import ProtectedRoute
 
-// Page Components
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import InteractiveExercisesPage from './pages/InteractiveExercisesPage';
-import DashboardPage from './pages/DashboardPage';
-import LogMealPage from './pages/LogMealPage';
-import TrackWeightPage from './pages/TrackWeightPage';
-import SettingsPage from './pages/SettingsPage';
-import TrackCaloriesPage from './pages/TrackCaloriesPage';
-import LogWorkoutPage from './pages/LogWorkoutPage';
-import WorkoutPlansPage from './pages/WorkoutPlansPage';
-import AdminUsersPage from './pages/AdminUsersPage';
-import AdminExercisesPage from './pages/AdminExercisesPage';
-import CalculatorsPage from './pages/CalculatorsPage';
-import RecipesPage from './pages/RecipesPage';
-import RecipeDetailPage from './pages/RecipesDetailPage';
+// Page Components (Ensure all have .jsx extension)
+import LoginPage from './pages/LoginPage.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
+import InteractiveExercisesPage from './pages/InteractiveExercisesPage.jsx';
+import DashboardPage from './pages/DashboardPage.jsx';
+import LogWorkoutPage from './pages/LogWorkoutPage.jsx';
+import TrackWeightPage from './pages/TrackWeightPage.jsx';
+import TrackCaloriesPage from './pages/TrackCaloriesPage.jsx';
+import LogMealPage from './pages/LogMealPage.jsx';
+import WorkoutPlansPage from './pages/WorkoutPlansPage.jsx';
+import SettingsPage from './pages/SettingsPage.jsx';
+//import ActivityLogPage from './pages/ActivityLogPage.jsx'; // <-- Placeholder Component
+import CalculatorsPage from './pages/CalculatorsPage.jsx';
+import RecipesPage from './pages/RecipesPage.jsx';
+import RecipeDetailPage from './pages/RecipeDetailPage.jsx';
+import AdminUsersPage from './pages/AdminUsersPage.jsx';
+import AdminExercisesPage from './pages/AdminExercisesPage.jsx'; // <-- Placeholder Component
 
-// Placeholders for new pages linked in the sidebar
-//const LogWorkoutPage = () => <div className="p-4 bg-white rounded-lg shadow">Log Workout Page Content</div>;
-//const TrackWeightPage = () => <div className="p-4 bg-white rounded-lg shadow">Track Weight Page Content</div>;
-//const TrackCaloriesPage = () => <div className="p-4 bg-white rounded-lg shadow">Track Calories Page Content</div>;
-//const LogMealPage = () => <div className="p-4 bg-white rounded-lg shadow">Log Meal Page Content</div>;
-//const WorkoutPlansPage = () => <div className="p-4 bg-white rounded-lg shadow">Workout Plans Page Content</div>;
-//const SettingsPage = () => <div className="p-4 bg-white rounded-lg shadow">Settings Page Content</div>;
-const ActivityLogPage = () => <div className="p-4 bg-white rounded-lg shadow">Activity Log Page Content</div>;
-
-// Other placeholders
-const AdminPlaceholder = () => <div className="p-4">Admin Page Placeholder</div>;
 const NotFoundPage = () => <div className="p-4">404 - Page Not Found</div>;
 
 
 function App() {
   return (
     <Routes>
-      {/* Routes WITHOUT the main AppLayout */}
+      {/* --- Public Routes --- */}
+      {/* Accessible by everyone */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      {/* Keep exercises public for guests? Or move inside layout? Assuming public for now */}
-      {/* <Route path="/exercises" element={<InteractiveExercisesPage />} /> */}
 
-      {/* Routes WITH the main AppLayout */}
-      <Route element={<AppLayout />}>
-        {/* Default route within layout */}
-        <Route path="/dashboard" element={<DashboardPage />} />
-        {/* Other routes using the layout */}
-        <Route path="/log-workout" element={<LogWorkoutPage />} />
-        <Route path="/track-weight" element={<TrackWeightPage />} />
-        <Route path="/track-calories" element={<TrackCaloriesPage />} />
-        <Route path="/log-meal" element={<LogMealPage />} />
-        <Route path="/exercises" element={<InteractiveExercisesPage />} /> {/* Moved exercises inside */}
-        <Route path="/workout-plans" element={<WorkoutPlansPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/activity-log" element={<ActivityLogPage />} />
-        <Route path="/calculators" element={<CalculatorsPage />} /> {/* <-- Add Calculators Route */}
-        {/* Add other routes like profile, etc. here */}
-        <Route path="/recipes" element={<RecipesPage />} />
-        <Route path="/recipes/:recipeId" element={<RecipeDetailPage />} />
+      {/* --- User Routes (Requires Login) --- */}
+      {/* Wrap the entire user section with ProtectedRoute */}
+      <Route element={<ProtectedRoute />}> {/* Checks if user is authenticated */}
+        <Route element={<AppLayout />}> {/* Apply AppLayout to nested routes */}
+          {/* Default route for logged-in users */}
+          <Route path="/dashboard" element={<DashboardPage />} />
+          {/* Other user routes */}
+          <Route path="/log-workout" element={<LogWorkoutPage />} />
+          <Route path="/track-weight" element={<TrackWeightPage />} />
+          <Route path="/track-calories" element={<TrackCaloriesPage />} />
+          <Route path="/log-meal" element={<LogMealPage />} />
+          <Route path="/exercises" element={<InteractiveExercisesPage />} />
+          <Route path="/workout-plans" element={<WorkoutPlansPage />} />
+          <Route path="/calculators" element={<CalculatorsPage />} />
+          <Route path="/recipes" element={<RecipesPage />} />
+          <Route path="/recipes/:recipeId" element={<RecipeDetailPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          {/* Add other user-specific routes here */}
+        </Route>
       </Route>
 
-      {/* --- Admin Routes --- */}
-      {/* Use AdminLayout to wrap all admin pages */}
-      <Route path="/admin" element={<AdminLayout />}>
-        {/* Default admin route redirects to users page */}
-        <Route index element={<Navigate to="/admin/users" replace />} />
-        {/* Specific admin pages */}
-        <Route path="users" element={<AdminUsersPage />} />
-        <Route path="exercises" element={<AdminExercisesPage />} />
-        {/* Add other admin routes like /admin/content etc. here */}
+
+      {/* --- Admin Routes (Requires Login + Admin Role) --- */}
+       {/* Wrap the entire admin section with ProtectedRoute, specifying allowedRoles */}
+      <Route element={<ProtectedRoute allowedRoles={['Admin']} />}> {/* Checks auth AND role */}
+        <Route path="/admin" element={<AdminLayout />}> {/* Apply AdminLayout */}
+          <Route index element={<Navigate to="/admin/users" replace />} /> {/* Default admin route */}
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="exercises" element={<AdminExercisesPage />} />
+          {/* Add other admin routes like /admin/content etc. here */}
+        </Route>
       </Route>
-      {/* --- End Admin Routes --- */}
 
-      {/* Default Route - Redirects to login */}
-      <Route path="/" element={<LoginPage />} />
 
-      {/* Not Found Route */}
+      {/* --- Default Route --- */}
+      {/* Redirect root path. If user is logged in, ProtectedRoute on /dashboard will handle it. */}
+      {/* If not logged in, ProtectedRoute will redirect from /dashboard to /login. */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+
+      {/* --- Not Found Route --- */}
+      {/* This will catch any route not defined above */}
       <Route path="*" element={<NotFoundPage />} />
+
     </Routes>
   );
 }
