@@ -1,79 +1,94 @@
-# FitnessApp
-## UserRoles
-- Guest:
-    - crearea unui plan de antrenament pe baza selectarii muschilor si a nivelului la care este
-    - citirea blog posturilor, studiilor?
-    - vizualizarea executarii exercitiilor
-- User:
-    - guest
-    - meal tracking, sleep tracking
-    - trackuirea antrenamenteloor, greutatii, caloriilor cu niste grafice
-    - crearea de blog posts
-    - poate cereri de prietenie intre users si crearea de grupuri
-    - leadboards
-    - vizualizarea volumului, reps, etc pentru o saptamana/luna/an
-    - workout planning
-    - friends
-- Admin:
-    - stergerea, adaugarea si modificarea(poate si subscriptii) utilizatorilor
-    - stergerea blog posturilor
-    - stergerea, adaugarea si modificarea exercitiilor
-    - stergerea, adaugarea si modificarea alimentelor?
-    - reset passwords, deactivate accounts
+# Proiect Aplicatie Fitness (Frontend React)
+
+## Descriere
+
+Aceasta este o aplicatie web prototip Aplicatia simuleaza functionalitati pentru monitorizarea activitatilor de fitness, a nutritiei, vizualizarea retetelor si managementul planurilor de antrenament. Include si o sectiune de administrare pentru gestionarea utilizatorilor si exercitiilor. In stadiul actual, aplicatia foloseste date simulate (mock data) si stocare locala in browser (localStorage) pentru a demonstra functionalitatile fara a necesita un backend real.
+
+## Functionalitati Implementate (Frontend)
+
+Aplicatia include urmatoarele pagini si functionalitati simulate:
+
+* **Autentificare / Inregistrare:** Interfete UI pentru login si register.
+* **Roluri Utilizatori:** Simulare pentru trei tipuri de acces: Vizitator (Guest), Utilizator Logat (User), Administrator (Admin).
+* **Navigare Protejata:** Rutare implementata cu `react-router-dom`, folosind componente `ProtectedRoute` pentru a restrictiona accesul pe baza rolului si a statusului de autentificare.
+* **Layout-uri Diferite:**
+    * `GuestLayout`: Un header simplu pentru paginile publice accesibile vizitatorilor.
+    * `AppLayout`: Layout principal pentru utilizatorii logati, cu sidebar navigabil si meniu profil.
+    * `AdminLayout`: Layout dedicat sectiunii de administrare, cu sidebar specific.
+* **Pagini Publice (Guest & User Logat):**
+    * **Exercitii Interactive:** Pagina cu un model SVG al corpului uman; click pe un muschi filtreaza lista de exercitii (date mock). Include vizualizare video exercitiu.
+    * **Retete:** Afisare retete (date mock) sub forma de carduri; pagina de detalii pentru fiecare reteta; filtrare simpla dupa tag-uri; adaugare reteta noua (salvata in `localStorage`).
+* **Pagini Utilizator Logat (User & Admin):**
+    * **Dashboard:** Pagina principala dupa login, cu widget-uri (actiuni rapide, activitate recenta mock, grafice progres mock); personalizabil (adaugare/stergere widget-uri, salvat in `localStorage`).
+    * **Inregistrare Antrenament:** Pagina pentru logarea unui antrenament; include timer, selectare data, adaugare exercitii (din lista mock) cu seturi multiple (reps, weight, unit), salvare log in state-ul sesiunii si afisare istoric sesiune.
+    * **Monitorizare Greutate:** Inregistrare greutate pentru o anumita data, afisare istoric (mock + adaugari sesiune), grafic Chart.js pentru vizualizare trend (date mock).
+    * **Monitorizare Calorii:** Pagina cu grafice Chart.js (linie pentru calorii, doughnut pentru macro) bazate pe date mock.
+    * **Inregistrare Mese:** Pagina pentru logarea meselor (Mic Dejun, Pranz, Cina, Gustare); cautare alimente (mock), adaugare in jurnalul zilei (state sesiune), calcul totaluri zilnice (state sesiune), input cantitate (grame).
+    * **Planuri Antrenament:** Vizualizare planuri mock; adaugare plan nou (nume, descriere, selectie exercitii - salvat in state sesiune).
+    * **Calculatoare Fitness:** Pagina cu calculatoare pentru BMR/TDEE (Mifflin-St Jeor), 1RM Estimat (Brzycki), Macronutrienti (pe baza de TDEE si presetari raport). Include selectie unitati (Metric/Imperial) si persistenta input folosind `localStorage`.
+    * **Setari:** Pagina placeholder pentru setari profil/aplicatie; include selectie unitate preferata (salvata local).
+    * **Jurnal Activitate:** Pagina ce afiseaza un feed cronologic simulat (mock data) de activitati diverse (antrenamente, mese, greutate). Include filtrare simpla.
+* **Pagini Admin (Doar Admin):**
+    * **Management Utilizatori:** Afisare lista utilizatori mock intr-un tabel sortabil si filtrabil (search); adaugare, editare, stergere (cu confirmare), activare/dezactivare utilizatori (modifica doar state-ul local) folosind modale. Include validare pentru email/username duplicat la adaugare/editare.
+    * **Management Exercitii:** Afisare lista exercitii mock intr-un tabel sortabil; adaugare, editare, stergere (cu confirmare) exercitii folosind modale; vizualizare video exercitiu intr-un modal.
+
+## Tehnologii Folosite
+
+* **Frontend:**
+    * React
+    * Vite 
+    * Tailwind CSS 
+    * React Router DOM 
+    * React Icons 
+    * Chart.js & react-chartjs-2 
+* **Backend (Intentie / Neimplementat):**
+    * Node.js
+    * Express.js
+    * MySQL (sau alta baza de date relationala)
 
 
-## Stack
-- Frontend: 
-    - React + Vite + Chart + Tailwind
-- Backend:
-    - Node + Express
-- Database:
-    - MySql
+## Rularea Aplicatiei
 
-### Aditionale
-- Poate creare de rol antrenor personal si users sa poata comunica cu antrenori personali?
-- Platforma de chat?
+**Prerechizite:**
 
+* Node.js (versiunea 18 sau mai recenta recomandata)
+* npm (vine de obicei cu Node.js)
 
-Okay, building on the features you've already mocked up, here are some ideas for additional functionalities you could add to your fitness app, keeping in mind these would eventually require backend support but can be prototyped on the frontend:
+**Pasi:**
 
-I. Enhanced Tracking & Logging:
+1.  **Clonare Repository:**
+    ```bash
+    git clone <URL_REPOSITORY>
+    cd <NUME_FOLDER_PROIECT>/frontend
+    ```
+2.  **Instalare Dependente:**
+    Navigheaza in folderul `frontend` (daca nu esti deja acolo) si ruleaza:
+    ```bash
+    npm install
+    ```
+3.  **Pornire Server Dezvoltare:**
+    Ruleaza comanda:
+    ```bash
+    npm run dev
+    ```
+4.  **Accesare Aplicatie:**
+    Deschide browser-ul web si navigheaza la adresa afisata in terminal (de obicei `http://localhost:5173` sau similar).
 
-Sleep Tracking: Log bedtime, wake-up time, maybe a quality rating (1-5 stars), and notes. Visualize sleep duration/consistency.
-Water Intake Tracking: Simple interface to log glasses/bottles/liters of water consumed daily. Visualize progress towards a daily goal.
-Body Measurements: Track more than weight – waist, hips, chest, arms, thighs, body fat % (if user knows it). Visualize changes over time.
-Progress Photos: A section to upload photos tagged with a date to visually track body composition changes (requires storage).
-Mood/Energy/Stress Logging: Simple daily check-in (e.g., sliders or emoji selection) to see correlations with activity, sleep, or nutrition.
-Rate of Perceived Exertion (RPE) / Intensity Logging: Add an optional field to workouts or sets to log how difficult it felt (e.g., scale of 1-10).
-II. Deeper Planning & Guidance:
+## Date Autentificare (Mock)
 
-Advanced Workout Plan Generator: Beyond basic muscle selection, filter by goals (strength, hypertrophy, endurance), available equipment, time per session, days per week.
-Exercise Substitution: When viewing a plan or exercise, offer a button to suggest/select alternative exercises targeting the same muscle group but using different equipment or variations.
-Progressive Overload Suggestions: Based on logged workout history for an exercise, suggest potential increases for the next session (e.g., "+2.5kg", "+1 rep").
-Pre-Built Programs: Offer a library of complete workout programs (e.g., 4-week strength block, 12-week hypertrophy plan) created by admins that users can follow.
-Warm-up/Cool-down Generator: Suggest simple routines based on the main exercises planned for the workout.
-Meal Planning Interface: Allow users to drag/drop foods or meals onto a weekly calendar view to plan nutrition.
-III. More Insightful Analysis & Reporting:
+Pentru a testa diferitele roluri, foloseste urmatoarele date de autentificare pe pagina de Login:
 
-Personal Records (PRs): Automatically detect and display PRs (e.g., heaviest weight lifted for X reps, fastest time, longest duration) based on logged workouts.
-Workout Volume Tracking: Calculate and chart volume (Sets * Reps * Weight) per workout, per muscle group, or over time.
-Consistency Tracker: Use a calendar heatmap or streak counter to visualize workout frequency and adherence to plans.
-Advanced Nutrition Reports: Breakdown of average macro/micronutrient intake over selected periods (requires detailed food data).
-Weight Trend Analysis: Show rate of change, projected trends, or comparison to goals.
-IV. Community & Social Features:
+* **Utilizator:**
+    * Email: `user@app.com`
+    * Parola: `password`
+* **Administrator:**
+    * Email: `admin@app.com`
+    * Parola: `password`
 
-Activity Feed: A feed showing recent public activities of friends (workouts logged, PRs achieved, blog posts created).
-Workout/Plan Sharing: Allow users to share their custom workout plans or logged sessions with friends within the app.
-Challenges: Admin-created or user-created fitness challenges (e.g., "Log 3 workouts this week", "30-day plank challenge") with participation tracking.
-Comments & Likes: Allow users to comment on or like logged workouts, blog posts, or shared plans.
-V. Content & Education:
+## Status Curent si Limitari
 
-Recipe Database: A section for users/admins to share healthy recipes with ingredients, instructions, and estimated nutritional info.
-Exercise Library Filters: Add more filtering options (equipment needed, force type - push/pull, specific smaller muscles).
-Form Check Integration (Conceptual): Placeholder for future AI form analysis or ability to link videos for feedback.
-VI. Utility & Personalization:
+* Aplicatia este un **prototip frontend**. Nu exista un backend functional conectat.
+* Toate datele afisate initial sunt **simulate (mock data)** din fisiere locale (`src/mockData/`).
+* Actiunile de **adaugare, editare sau stergere** (utilizatori, exercitii, retete, planuri, log-uri) modifica doar **starea locala a componentelor** sau folosesc `localStorage`. Datele **nu sunt persistente** intr-o baza de date reala si se pierd la inchiderea completa a browserului (pentru state) sau daca se curata `localStorage`.
+* Functionalitatile legate de **notificari sau sincronizare cu dispozitive externe** nu sunt implementate si sunt doar pentru UI.
 
-Goal Setting: Dedicated section to set specific, measurable goals (e.g., "Lose 5kg by July", "Bench Press 100kg", "Run 5k") and track progress.
-Customizable Dashboard: Allow users to add, remove, or rearrange the widgets shown on their dashboard.
-Calculators: Integrate fitness calculators (BMR/TDEE, 1 Rep Max estimate, Macro calculator).
-Data Export: Allow users to export their logged data (workouts, weight, meals) as CSV.
