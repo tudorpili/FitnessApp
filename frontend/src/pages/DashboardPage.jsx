@@ -94,9 +94,9 @@ const TodaysSummaryWidget = () => {
     const goals = { calories: 2200, protein: 150, steps: 8000, waterMl: 2000 };
 
     // Simple progress calculation
-    const calorieProgress = Math.min(100, Math.round((summary.calories / goals.calories) * 100));
-    const stepProgress = Math.min(100, Math.round((summary.steps / goals.steps) * 100));
-    const waterProgress = Math.min(100, Math.round((summary.waterMl / goals.waterMl) * 100));
+    //const calorieProgress = Math.min(100, Math.round((summary.calories / goals.calories) * 100));
+    //const stepProgress = Math.min(100, Math.round((summary.steps / goals.steps) * 100));
+    //const waterProgress = Math.min(100, Math.round((summary.waterMl / goals.waterMl) * 100));
 
     return (
         <div className="space-y-4">
