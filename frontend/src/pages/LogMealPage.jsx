@@ -1,19 +1,17 @@
 // src/pages/LogMealPage.jsx
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { mockFoods, calculateMacros } from '../mockData/foods'; // Import mock data
-import { FiSearch, FiPlusCircle, FiTrash2, FiCalendar, FiActivity } from 'react-icons/fi'; // Added FiActivity for summary icon
-import { FaAppleAlt, FaDrumstickBite, FaBreadSlice, FaTint } from 'react-icons/fa'; // Example icons for macros
+import { mockFoods, calculateMacros } from '../mockData/foods'; 
+import { FiSearch, FiPlusCircle, FiTrash2, FiCalendar, FiActivity } from 'react-icons/fi'; 
+import { FaAppleAlt, FaDrumstickBite, FaBreadSlice, FaTint } from 'react-icons/fa'; 
 
-// Get today's date in YYYY-MM-DD format
 const getTodayDate = () => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const month = String(today.getMonth() + 1).padStart(2, '0'); 
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 };
 
-// Meal types with emojis
 const mealTypes = [
     { name: 'Breakfast', emoji: '🍳' },
     { name: 'Lunch', emoji: '🥪' },
@@ -21,7 +19,6 @@ const mealTypes = [
     { name: 'Snack', emoji: '🍎' }
 ];
 
-// -- Reusable Components --
 const MealSectionCard = ({ title, children, className = '', icon }) => (
   <div className={`bg-white/70 backdrop-blur-lg rounded-2xl shadow-lg p-6 ${className}`}>
     <h2 className="text-xl font-semibold text-gray-800 mb-4 tracking-tight flex items-center">
@@ -57,16 +54,14 @@ const LoggedItemCard = ({ item, onRemove }) => (
         </button>
     </li>
 );
-// ------------------------
 
 function LogMealPage() {
     const [selectedDate, setSelectedDate] = useState(getTodayDate());
     const [selectedMeal, setSelectedMeal] = useState('Breakfast');
     const [searchTerm, setSearchTerm] = useState('');
-    const [sessionLoggedItems, setSessionLoggedItems] = useState([]); // Holds ALL items logged in session
+    const [sessionLoggedItems, setSessionLoggedItems] = useState([]);
     const loggedItemsListRef = useRef(null);
 
-    // Filter mock foods based on search term
     const searchResults = useMemo(() => {
         if (!searchTerm.trim()) return [];
         return mockFoods.filter(food =>
@@ -74,18 +69,14 @@ function LogMealPage() {
         ).slice(0, 10);
     }, [searchTerm]);
 
-    // Filter session items for the currently selected date and meal
     const currentMealItems = useMemo(() => {
         return sessionLoggedItems.filter(item =>
             item.date === selectedDate && item.meal === selectedMeal
         );
     }, [sessionLoggedItems, selectedDate, selectedMeal]);
 
-    // --- NEW: Calculate Daily Totals ---
     const dailyTotals = useMemo(() => {
-        // Filter items only by the selected date
         const itemsForDay = sessionLoggedItems.filter(item => item.date === selectedDate);
-        // Sum up the macros
         return itemsForDay.reduce((totals, item) => {
             totals.calories += item.calories || 0;
             totals.protein += item.protein || 0;
@@ -93,10 +84,8 @@ function LogMealPage() {
             totals.fat += item.fat || 0;
             return totals;
         }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
-    }, [sessionLoggedItems, selectedDate]); // Recalculate when items or date change
-    // --- END NEW ---
+    }, [sessionLoggedItems, selectedDate]); 
 
-    // Function to add a food item
     const handleAddFood = (food) => {
         const quantityG = food.defaultServingG || 100;
         const macros = calculateMacros(food, quantityG);
@@ -110,14 +99,12 @@ function LogMealPage() {
         setSearchTerm('');
     };
 
-    // Function to remove an item
      const handleRemoveItem = (logIdToRemove) => {
         setSessionLoggedItems(prevItems =>
             prevItems.filter(item => item.logId !== logIdToRemove)
         );
     };
 
-    // Calculate totals for the current meal shown
     const currentMealTotals = useMemo(() => {
         return currentMealItems.reduce((totals, item) => {
             totals.calories += item.calories || 0;
@@ -128,21 +115,18 @@ function LogMealPage() {
         }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
     }, [currentMealItems]);
 
-    // Auto-scroll effect
      useEffect(() => {
         if (loggedItemsListRef.current) {
             loggedItemsListRef.current.scrollTop = loggedItemsListRef.current.scrollHeight;
         }
-     }, [currentMealItems]); // Scroll when items for the *current* meal change
+     }, [currentMealItems]);
 
     return (
         <div className="space-y-8 sm:space-y-10 font-sans max-w-screen-xl mx-auto">
-            {/* Page Header */}
             <div className="pb-6 border-b border-gray-200">
                 <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
                     Log Your Meal
                 </h1>
-                {/* Date Selection moved here */}
                 <div className="flex items-center gap-2 mt-4">
                      <label htmlFor="log-date" className="flex items-center text-sm font-medium text-gray-700">
                         <FiCalendar className="mr-1.5 h-4 w-4 text-gray-500"/> Logging for:
@@ -157,7 +141,6 @@ function LogMealPage() {
                 </div>
             </div>
 
-             {/* Meal Type Selection - Segmented Control Style */}
             <div className="bg-white/70 backdrop-blur-lg p-4 rounded-2xl shadow-lg">
                 <div className="bg-gray-100 p-1.5 rounded-full flex flex-wrap gap-1 justify-center sm:justify-start">
                     {mealTypes.map(meal => (
@@ -176,7 +159,6 @@ function LogMealPage() {
                 </div>
             </div>
 
-            {/* --- NEW: Daily Summary Card --- */}
             <MealSectionCard title={`Totals for ${selectedDate}`} icon={<FiActivity />}>
                 {sessionLoggedItems.filter(i=>i.date === selectedDate).length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
@@ -205,15 +187,11 @@ function LogMealPage() {
                      <p className="text-sm text-gray-500 italic text-center py-4">Log your first item for today to see totals.</p>
                 )}
             </MealSectionCard>
-            {/* --- END NEW --- */}
 
 
-            {/* Main Content Grid - 2 Columns on Large Screens */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
 
-                {/* Left Column: Search and Add */}
                 <MealSectionCard title={`Add Food to ${selectedMeal}`} icon={mealTypes.find(m => m.name === selectedMeal)?.emoji} className="lg:sticky lg:top-6"> {/* Made search sticky */}
-                     {/* Search Input */}
                      <div className="relative">
                         <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"> <FiSearch /> </span>
                         <input
@@ -223,7 +201,6 @@ function LogMealPage() {
                         />
                      </div>
 
-                     {/* Search Results */}
                      {searchTerm && (
                         <div className="mt-4 border border-gray-200 rounded-xl max-h-72 overflow-y-auto bg-white shadow-inner">
                              <h3 className="text-xs font-semibold uppercase text-gray-500 p-3 border-b border-gray-200 sticky top-0 bg-gray-50/90 backdrop-blur-sm z-10">Search Results</h3>
@@ -244,7 +221,6 @@ function LogMealPage() {
                      )}
                 </MealSectionCard>
 
-                {/* Right Column: Logged Items */}
                 <MealSectionCard title={`Logged in ${selectedMeal}`} icon={mealTypes.find(m => m.name === selectedMeal)?.emoji}>
                      {currentMealItems.length > 0 ? (
                         <>
@@ -253,7 +229,6 @@ function LogMealPage() {
                                     <LoggedItemCard key={item.logId} item={item} onRemove={handleRemoveItem} />
                                 ))}
                             </ul>
-                            {/* Meal Totals */}
                             <div className="pt-5 border-t border-gray-200 mt-5 text-sm font-semibold text-gray-800 space-y-1">
                                 <p className="text-base">Total for {selectedMeal}:</p>
                                 <p><span className="text-yellow-600">~{currentMealTotals.calories} kcal</span></p>
@@ -265,9 +240,9 @@ function LogMealPage() {
                      ) : ( <p className="text-sm text-gray-500 italic text-center py-8">No items logged for {selectedMeal} yet.</p> )}
                  </MealSectionCard>
 
-            </div> {/* End Main Content Grid */}
+            </div>
 
-        </div> // End Page Container
+        </div>
     );
 }
 

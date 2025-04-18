@@ -1,30 +1,20 @@
 // src/components/Muscles/Illustration.jsx
 import React, { useEffect } from 'react';
-// Removed: import { useMantineColorScheme } from '@mantine/core'; // Removed Mantine
-import styles from './Muscles.module.css'; // Ensure path is correct
+import styles from './Muscles.module.css'; 
 
-// Props:
-// - toggleMuscle: function(muscleName) => void
-// - muscles: string[] - array of currently selected muscle names (e.g., ['Chest', 'Biceps'])
-// - exerciseCount: { _id: string }[] - array indicating muscles with exercises (e.g., [{_id: 'Chest'}, {_id: 'Legs'}])
 const Illustration = ({ toggleMuscle, muscles = [], exerciseCount = [] }) => {
-  // Removed Mantine color scheme logic
-  // const { colorScheme } = useMantineColorScheme()
-  // const dark = colorScheme === 'dark'
-  const dark = false; // Defaulting to light mode
 
-  // Effect to update ACTIVE muscles based on the 'muscles' prop (selected muscles)
+  const dark = false;
+
   useEffect(() => {
     const parentElement = document.getElementById('muscle-illustration');
     if (!parentElement) return;
 
-    // Clear previous active classes
     const activeElements = parentElement.querySelectorAll(`.${styles.active}`);
     activeElements.forEach((element) => {
       element.classList.remove(styles.active);
     });
 
-    // Add active class to currently selected muscles
     muscles.forEach((muscle) => {
       const elements = parentElement.querySelectorAll(`[data-elem="${muscle}"]`);
       elements.forEach((element) => {
@@ -33,25 +23,20 @@ const Illustration = ({ toggleMuscle, muscles = [], exerciseCount = [] }) => {
     });
   }, [muscles]);
 
-  // Effect to update ENABLED muscles based on the 'exerciseCount' prop
    useEffect(() => {
     const parentElement = document.getElementById('muscle-illustration');
      if (!parentElement) return;
 
-    // Clear previous enabled classes (safer to re-apply)
     const enabledElements = parentElement.querySelectorAll(`.${styles.enabled}`);
     enabledElements.forEach((element) => {
       element.classList.remove(styles.enabled);
     });
 
-    // Add enabled class to muscles that have exercises
     exerciseCount.forEach(({ _id: muscle }) => {
        if (muscle) {
          const elements = parentElement.querySelectorAll(`[data-elem="${muscle}"]`);
          elements.forEach((element) => {
            element.classList.add(styles.enabled);
-           // Add the base muscle class if it's not already there
-           // This assumes your SVG paths might not have the class initially
            if (!element.classList.contains(styles.muscle)) {
                element.classList.add(styles.muscle);
            }
@@ -60,24 +45,20 @@ const Illustration = ({ toggleMuscle, muscles = [], exerciseCount = [] }) => {
     });
   }, [exerciseCount]);
 
-  // Effect to handle HOVER and CLICK interactions
   useEffect(() => {
     const parentElement = document.getElementById('muscle-illustration');
      if (!parentElement) return;
 
     const handleHover = (event) => {
         const target = event.target;
-        // Find the closest ancestor or self with data-elem
         const muscleTarget = target.closest('[data-elem]');
         if (muscleTarget && muscleTarget.classList.contains(styles.enabled)) {
             const dataElemValue = muscleTarget.dataset.elem;
-            // Find all elements for that muscle group within the SVG
             const elements = parentElement.querySelectorAll(`[data-elem="${dataElemValue}"]`);
             elements.forEach((element) => {
                 element.classList.toggle(styles.hover, event.type === 'mouseover');
             });
         } else if (event.type === 'mouseout') {
-            // Clear any existing hover styles when moving off an interactive area
             const hoveredElements = parentElement.querySelectorAll(`.${styles.hover}`);
             hoveredElements.forEach(el => el.classList.remove(styles.hover));
         }
@@ -86,7 +67,6 @@ const Illustration = ({ toggleMuscle, muscles = [], exerciseCount = [] }) => {
 
     const handleClick = (event) => {
       const target = event.target;
-       // Find the closest ancestor or self with data-elem
       const muscleTarget = target.closest('[data-elem]');
 
       if (muscleTarget) {
@@ -98,21 +78,18 @@ const Illustration = ({ toggleMuscle, muscles = [], exerciseCount = [] }) => {
       }
     };
 
-    // Add event listeners to the SVG container
     parentElement.addEventListener('mouseover', handleHover);
     parentElement.addEventListener('mouseout', handleHover);
     parentElement.addEventListener('click', handleClick);
 
-    // Clean up
     return () => {
       parentElement.removeEventListener('mouseover', handleHover);
       parentElement.removeEventListener('mouseout', handleHover);
       parentElement.removeEventListener('click', handleClick);
     };
-  }, [toggleMuscle]); // Dependency array includes toggleMuscle
+  }, [toggleMuscle]); 
 
   return (
-    // The SVG element itself needs the ID for getElementById to work
     <svg
       id='muscle-illustration'
       xmlns='http://www.w3.org/2000/svg'

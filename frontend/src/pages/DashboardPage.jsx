@@ -3,23 +3,19 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
     FiPlusSquare, FiTrendingUp, FiCoffee, FiZap, FiList, FiBarChart2, FiTarget,
-    FiSettings, FiX, FiCheck, FiGrid, FiActivity, FiSunrise, FiAward, FiGift, // Added icons
-    FiDroplet, FiEdit, FiCheckSquare // Added Water, Edit
+    FiSettings, FiX, FiCheck, FiGrid, FiActivity, FiSunrise, FiAward, FiGift,
+    FiDroplet, FiEdit, FiCheckSquare 
 } from 'react-icons/fi';
 import { FaQuoteLeft, FaFire } from 'react-icons/fa'; // Icon for quote
-// Import Chart components
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement,
   Title, Tooltip, Legend, Filler
 } from 'chart.js';
 
-// --- Register Chart.js components ---
 ChartJS.register( CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler );
 
-// --- Reusable Card Component (Enhanced Styling) ---
 const DashboardCard = ({ title, children, className = '', icon, onRemove, isEditing, category = 'default' }) => {
-    // Define category styles - subtle background gradients or border colors
     const categoryStyles = {
         fitness: 'from-indigo-50/70 to-purple-50/60 border-indigo-100',
         nutrition: 'from-emerald-50/70 to-green-50/60 border-emerald-100',
@@ -54,7 +50,6 @@ const DashboardCard = ({ title, children, className = '', icon, onRemove, isEdit
 };
 
 
-// --- Individual Widget Components ---
 
 const QuickActionsWidget = () => ( /* ... Widget JSX (minor style tweaks maybe) ... */
      <> <p className="text-sm text-gray-500 -mt-3 mb-4">Quickly log your activities.</p> <div className="grid grid-cols-2 gap-4"> <Link to="/log-workout" className="group flex flex-col items-center justify-center p-4 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-200 ease-in-out text-center"> <FiPlusSquare className="h-7 w-7 mb-1.5 group-hover:scale-110 transition-transform" /> <span className="font-semibold text-xs sm:text-sm">Log Workout</span> </Link> <Link to="/log-meal" className="group flex flex-col items-center justify-center p-4 bg-gradient-to-br from-green-500 to-teal-600 text-white rounded-2xl shadow-lg hover:shadow-lg transform hover:-translate-y-1 transition duration-200 ease-in-out text-center"> <FiCoffee className="h-7 w-7 mb-1.5 group-hover:scale-110 transition-transform" /> <span className="font-semibold text-xs sm:text-sm">Log Meal</span> </Link> <Link to="/track-weight" className="group flex flex-col items-center justify-center p-4 bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-2xl shadow-lg hover:shadow-lg transform hover:-translate-y-1 transition duration-200 ease-in-out text-center"> <FiTrendingUp className="h-7 w-7 mb-1.5 group-hover:scale-110 transition-transform" /> <span className="font-semibold text-xs sm:text-sm">Log Weight</span> </Link> <Link to="/workout-plans" className="group flex flex-col items-center justify-center p-4 bg-gradient-to-br from-yellow-500 to-orange-600 text-white rounded-2xl shadow-lg hover:shadow-lg transform hover:-translate-y-1 transition duration-200 ease-in-out text-center"> <FiZap className="h-7 w-7 mb-1.5 group-hover:scale-110 transition-transform" /> <span className="font-semibold text-xs sm:text-sm">My Plans</span> </Link> </div> </>
@@ -74,7 +69,6 @@ const ProgressOverviewWidget = () => { /* ... Chart Logic (remains the same) ...
     return ( <> <p className="text-gray-500 text-sm italic -mt-3 mb-5"> Recent trends (Sample Data). </p> <div className="grid grid-cols-1 gap-6"> <div> <h4 className="text-xs font-semibold text-gray-600 mb-2 text-center">Weight Trend (kg)</h4> <div className="h-48"> <Line options={dashboardChartOptions} data={weightChartData} /> </div> </div> <div> <h4 className="text-xs font-semibold text-gray-600 mb-2 text-center">Calorie Trend (kcal)</h4> <div className="h-48"> <Line options={dashboardChartOptions} data={calorieChartData} /> </div> </div> </div> </> );
 };
 
-// --- NEW WIDGETS ---
 
 const MotivationalQuoteWidget = () => {
     const quotes = useMemo(() => [ "Progress, not perfection.", "You’re stronger than yesterday.", "The body achieves what the mind believes.", "Strive for progress.", "Be stronger than your excuses." ], []);
@@ -89,19 +83,13 @@ const MotivationalQuoteWidget = () => {
 };
 
 const TodaysSummaryWidget = () => {
-    // Mock data for today's summary
     const summary = { calories: 850, protein: 60, steps: 3450, waterMl: 750 };
     const goals = { calories: 2200, protein: 150, steps: 8000, waterMl: 2000 };
 
-    // Simple progress calculation
-    //const calorieProgress = Math.min(100, Math.round((summary.calories / goals.calories) * 100));
-    //const stepProgress = Math.min(100, Math.round((summary.steps / goals.steps) * 100));
-    //const waterProgress = Math.min(100, Math.round((summary.waterMl / goals.waterMl) * 100));
 
     return (
         <div className="space-y-4">
              <p className="text-sm text-gray-500 -mt-3 mb-3">Your snapshot for today.</p>
-             {/* Example using simple text - could be replaced with progress rings/bars */}
              <div className="flex items-center justify-between text-sm border-b border-gray-100 pb-2">
                 <span className="flex items-center text-yellow-600"><FaFire className="mr-1.5"/> Calories</span>
                 <span className="font-semibold">{summary.calories} / {goals.calories} kcal</span>
@@ -119,7 +107,6 @@ const TodaysSummaryWidget = () => {
 };
 
 const GoalTrackerWidget = () => {
-    // Mock goal data
     const goals = [
         { id: 'g1', name: 'Complete 3 Workouts this Week', current: 2, target: 3 },
         { id: 'g2', name: 'Reach 74kg Bodyweight', current: 75.0, target: 74.0 },
@@ -130,11 +117,9 @@ const GoalTrackerWidget = () => {
              <p className="text-sm text-gray-500 -mt-3 mb-3">Your current goals.</p>
              {goals.map(goal => {
                  const progress = goal.target > 0 ? Math.min(100, Math.max(0, Math.round((goal.current / goal.target) * 100))) : 0;
-                 // Simple text representation - replace with progress bar later
                  return (
                      <div key={goal.id} className="text-sm">
                          <p className="font-medium text-gray-700 mb-1">{goal.name}</p>
-                         {/* Basic Progress Bar Simulation */}
                          <div className="w-full bg-gray-200 rounded-full h-2">
                              <div className="bg-gradient-to-r from-green-400 to-blue-500 h-2 rounded-full" style={{ width: `${progress}%` }}></div>
                          </div>
@@ -159,7 +144,6 @@ const SuggestionsWidget = () => (
 );
 
 
-// --- Configuration of ALL available widgets (including new ones) ---
 const ALL_WIDGETS_CONFIG = [
     { id: 'quickActions', title: 'Quick Actions', icon: <FiZap/>, component: QuickActionsWidget, category: 'default' },
     { id: 'todaysSummary', title: "Today's Summary", icon: <FiCheckSquare/>, component: TodaysSummaryWidget, category: 'tracking' }, // NEW
@@ -170,7 +154,6 @@ const ALL_WIDGETS_CONFIG = [
     { id: 'suggestions', title: 'Suggestions', icon: <FiGift/>, component: SuggestionsWidget, category: 'motivation' }, // NEW
 ];
 
-// --- Customization Modal ---
 const CustomizeDashboardModal = ({ isOpen, onClose, allWidgets, visibleIds, onSave }) => { /* ... Modal code remains the same ... */
     const [currentSelection, setCurrentSelection] = useState(new Set(visibleIds));
     useEffect(() => { if (isOpen) { setCurrentSelection(new Set(visibleIds)); } }, [isOpen, visibleIds]);
@@ -181,9 +164,7 @@ const CustomizeDashboardModal = ({ isOpen, onClose, allWidgets, visibleIds, onSa
 };
 
 
-// --- Main Dashboard Page Component ---
 function DashboardPage() {
-    // Updated default widgets to include new ones
     const [visibleWidgetIds, setVisibleWidgetIds] = useState(() => {
         const saved = localStorage.getItem('dashboardWidgets');
         return saved ? JSON.parse(saved) : ['quickActions', 'todaysSummary', 'recentActivity', 'progressOverview', 'goalTracker', 'quote']; // Updated default
@@ -200,19 +181,16 @@ function DashboardPage() {
 
     return (
         <>
-            {/* Increased overall spacing */}
             <div className="space-y-10 sm:space-y-12 animate-fadeIn">
-                {/* Welcome section - More prominent */}
                 <div className="pb-6">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
-                        Welcome Back! {/* Add user name here if/when auth exists */}
+                        Welcome Back! 
                     </h1>
                     <p className="mt-3 text-xl text-slate-600">
                         Here's your fitness snapshot for today.
                     </p>
                 </div>
 
-                {/* Header with Customize Button */}
                 <div className="flex justify-between items-center">
                      <h2 className="text-2xl font-bold text-slate-800">Your Dashboard</h2>
                      <button onClick={() => setIsEditing(!isEditing)} className={`flex items-center px-4 py-2 rounded-xl text-sm font-medium border transition-all duration-200 ease-out shadow-sm ${ isEditing ? 'bg-indigo-600 text-white border-transparent scale-105 shadow-lg' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100 hover:scale-105' }`}>
@@ -220,19 +198,17 @@ function DashboardPage() {
                     </button>
                 </div>
 
-                {/* Render Visible Widgets - Adjusted grid columns */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 sm:gap-10">
                     {visibleWidgets.length > 0 ? (
                         visibleWidgets.map(widget => {
                             const WidgetComponent = widget.component;
-                            // Basic logic for column span (can be made more sophisticated)
                             const colSpan = (widget.id === 'progressOverview' || widget.id === 'recentActivity') ? 'xl:col-span-1' : 'xl:col-span-1';
                             return (
                                 <div key={widget.id} className={`animate-fadeIn ${colSpan}`}> {/* Add animation to each card */}
                                     <DashboardCard
                                         title={widget.title}
                                         icon={widget.icon || <FiGrid />}
-                                        category={widget.category} // Pass category for styling
+                                        category={widget.category} 
                                         onRemove={() => handleRemoveWidget(widget.id)}
                                         isEditing={isEditing}
                                     >
@@ -242,7 +218,6 @@ function DashboardPage() {
                             );
                         })
                     ) : (
-                        // Empty state message spans full width
                          <div className="md:col-span-2 xl:col-span-3 text-center py-12 px-6 bg-white/50 backdrop-blur-md rounded-3xl shadow-lg border border-gray-200">
                             <h3 className="text-xl font-semibold text-gray-700 mb-3">Dashboard Empty</h3>
                             <p className="text-gray-500 text-base mb-5">Add some widgets to get started!</p>
@@ -252,11 +227,9 @@ function DashboardPage() {
                         </div>
                     )}
                 </div>
-                 {/* Hint for editing mode */}
                  {isEditing && ( <p className="text-center text-sm text-indigo-700 font-medium pt-4"> Editing mode active. Click (X) on widgets to remove. Click "Done Editing" to save. </p> )}
             </div>
 
-            {/* Render Customization Modal */}
             <CustomizeDashboardModal isOpen={isEditing} onClose={() => setIsEditing(false)} allWidgets={ALL_WIDGETS_CONFIG} visibleIds={visibleWidgetIds} onSave={handleSaveCustomization} />
         </>
     );

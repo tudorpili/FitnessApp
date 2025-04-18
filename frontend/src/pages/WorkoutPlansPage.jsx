@@ -1,9 +1,8 @@
 // src/pages/WorkoutPlansPage.jsx
 import React, { useState, useMemo } from 'react';
-import { mockExercises } from '../mockData/exercises'; // Using single-muscle version
-import { FiPlus, FiSearch, FiTrash2, FiX, FiSave, FiClipboard, FiEdit, FiEye, FiList } from 'react-icons/fi'; // Import icons
+import { mockExercises } from '../mockData/exercises';
+import { FiPlus, FiSearch, FiTrash2, FiX, FiSave, FiClipboard, FiEdit, FiEye, FiList } from 'react-icons/fi';
 
-// Mock initial plans (replace with fetched data or local storage later)
 const initialPlans = [
     {
         id: 'plan1', name: 'Beginner Full Body A', description: 'Focus on compound movements, 3 times a week.',
@@ -19,7 +18,6 @@ const initialPlans = [
     },
 ];
 
-// Reusable Card component
 const InfoCard = ({ title, children, className = '', icon }) => (
   <div className={`bg-white/60 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg shadow-indigo-100/50 p-6 sm:p-8 ${className}`}>
     <h2 className="text-xl font-semibold text-gray-800 mb-5 tracking-tight flex items-center">
@@ -30,19 +28,17 @@ const InfoCard = ({ title, children, className = '', icon }) => (
   </div>
 );
 
-// --- Main WorkoutPlansPage Component ---
 function WorkoutPlansPage() {
-    const [plans, setPlans] = useState(initialPlans); // Holds all plans
-    const [isCreating, setIsCreating] = useState(false); // Toggle create form visibility
+    const [plans, setPlans] = useState(initialPlans); 
+    const [isCreating, setIsCreating] = useState(false);
 
-    // State for the new plan being created
+
     const [newPlanName, setNewPlanName] = useState('');
     const [newPlanDescription, setNewPlanDescription] = useState('');
-    const [newPlanExercises, setNewPlanExercises] = useState([]); // Array of { exerciseId, name }
+    const [newPlanExercises, setNewPlanExercises] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [formError, setFormError] = useState('');
 
-    // Filter exercises for search (exclude already added)
     const searchResults = useMemo(() => {
         if (!searchTerm.trim()) return [];
         const addedIds = new Set(newPlanExercises.map(ex => ex.exerciseId));
@@ -51,10 +47,10 @@ function WorkoutPlansPage() {
             .slice(0, 8);
     }, [searchTerm, newPlanExercises]);
 
-    // Toggle create form
+
     const handleToggleCreate = (show) => {
         setIsCreating(show);
-        if (!show) { // Reset form if closing
+        if (!show) { 
             setNewPlanName('');
             setNewPlanDescription('');
             setNewPlanExercises([]);
@@ -63,20 +59,19 @@ function WorkoutPlansPage() {
         }
     };
 
-    // Add exercise to the plan being created
+ 
     const handleAddExerciseToPlan = (exercise) => {
         if (!newPlanExercises.some(ex => ex.exerciseId === exercise.id)) {
             setNewPlanExercises(prev => [...prev, { exerciseId: exercise.id, name: exercise.name }]);
         }
-        setSearchTerm(''); // Clear search after adding
+        setSearchTerm(''); 
     };
 
-    // Remove exercise from the plan being created
+ 
     const handleRemoveExerciseFromPlan = (exerciseIdToRemove) => {
         setNewPlanExercises(prev => prev.filter(ex => ex.exerciseId !== exerciseIdToRemove));
     };
 
-    // Save the new plan (adds to state for session only)
     const handleSavePlan = () => {
         setFormError('');
         if (!newPlanName.trim()) {
@@ -89,21 +84,20 @@ function WorkoutPlansPage() {
         }
 
         const newPlan = {
-            id: `plan-${Date.now()}`, // Simple unique ID
+            id: `plan-${Date.now()}`, 
             name: newPlanName,
             description: newPlanDescription,
             exercises: newPlanExercises,
         };
 
-        setPlans(prevPlans => [newPlan, ...prevPlans]); // Add new plan to the beginning
-        handleToggleCreate(false); // Close the form
+        setPlans(prevPlans => [newPlan, ...prevPlans]); 
+        handleToggleCreate(false); 
         console.log("New Plan Saved (Session Only):", newPlan);
     };
 
 
     return (
         <div className="space-y-8 sm:space-y-10 max-w-6xl mx-auto animate-fadeIn">
-            {/* Page Header */}
             <div className="pb-6 border-b border-gray-200/80 flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight flex items-center">
@@ -113,7 +107,6 @@ function WorkoutPlansPage() {
                         Create, view, and manage your training routines.
                     </p>
                 </div>
-                 {/* Show Create button only when not already creating */}
                  {!isCreating && (
                     <button
                         onClick={() => handleToggleCreate(true)}
@@ -124,11 +117,9 @@ function WorkoutPlansPage() {
                  )}
             </div>
 
-            {/* --- Create New Plan Form (Conditional) --- */}
             {isCreating && (
                 <InfoCard title="Create New Workout Plan" icon={<FiPlus />}>
                     <div className="space-y-6">
-                        {/* Plan Name & Description */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                              <div>
                                 <label htmlFor="plan-name" className="block text-sm font-medium text-gray-700 mb-1">Plan Name *</label>
@@ -140,18 +131,15 @@ function WorkoutPlansPage() {
                             </div>
                         </div>
 
-                        {/* Add Exercises Section */}
                         <div>
                              <label className="block text-sm font-medium text-gray-700 mb-1">Add Exercises</label>
                              <div className="relative mb-3">
                                 <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 pointer-events-none"> <FiSearch /> </span>
                                 <input type="text" placeholder="Search exercises..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 shadow-sm focus:shadow-md"/>
                              </div>
-                             {/* Search Results */}
                              {searchTerm && ( <div className="border border-gray-200 rounded-xl max-h-48 overflow-y-auto bg-white shadow-inner mb-4">{searchResults.length > 0 ? ( <ul className="divide-y divide-gray-100"> {searchResults.map(ex => ( <li key={ex.id} className="p-3 flex justify-between items-center hover:bg-indigo-50 transition duration-150 group"> <p className="text-sm font-medium text-gray-900">{ex.name} <span className="text-xs text-gray-500">({ex.muscle})</span></p> <button onClick={() => handleAddExerciseToPlan(ex)} className="p-2 text-indigo-600 hover:text-white hover:bg-indigo-500 rounded-full transition-all duration-150 transform group-hover:scale-110" title={`Add ${ex.name}`} aria-label={`Add ${ex.name}`}><FiPlusCircle className="h-5 w-5"/></button> </li> ))} </ul> ) : ( <p className="p-4 text-sm text-gray-500 text-center italic">No matching exercises found.</p> )}</div> )}
                         </div>
 
-                        {/* Exercises Added to Plan */}
                         <div>
                              <h3 className="text-md font-semibold text-gray-700 mb-2">Exercises in Plan ({newPlanExercises.length})</h3>
                              {newPlanExercises.length > 0 ? (
@@ -168,10 +156,8 @@ function WorkoutPlansPage() {
                              )}
                         </div>
 
-                        {/* Form Error */}
                         {formError && <p className="text-sm text-red-600">{formError}</p>}
 
-                        {/* Action Buttons */}
                         <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
                             <button onClick={() => handleToggleCreate(false)} type="button" className="px-5 py-2 rounded-xl border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-100 transition duration-150">
                                 Cancel
@@ -184,7 +170,6 @@ function WorkoutPlansPage() {
                 </InfoCard>
             )}
 
-            {/* --- Display Existing Plans (Conditional) --- */}
             {!isCreating && (
                 <InfoCard title="Your Plans" icon={<FiList />}>
                     {plans.length > 0 ? (
@@ -216,7 +201,7 @@ function WorkoutPlansPage() {
                 </InfoCard>
             )}
 
-        </div> // End Page Container
+        </div>
     );
 }
 

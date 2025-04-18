@@ -1,14 +1,8 @@
 // src/pages/RegisterPage.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// Import icons
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiCheckCircle, FiTrendingUp } from 'react-icons/fi';
 
-// Re-use InputWithIcon and PasswordInput from LoginPage or move them to src/components/common/
-// For brevity, assuming they are available or copy-pasted here.
-// If moved, import them: import { InputWithIcon, PasswordInput } from '../components/common/FormInputs';
-
-// Simple Password Strength Meter component
 const PasswordStrengthMeter = ({ strength }) => {
   const levels = {
     weak: { color: 'bg-red-500', text: 'Weak' },
@@ -32,7 +26,6 @@ const PasswordStrengthMeter = ({ strength }) => {
   );
 };
 
-// Array of quotes
 const motivationalQuotes = [
     "The body achieves what the mind believes.",
     "Push yourself because no one else is going to do it for you.",
@@ -46,19 +39,17 @@ function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [fitnessLevel, setFitnessLevel] = useState('Beginner'); // Default level
+  const [fitnessLevel, setFitnessLevel] = useState('Beginner');
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [quote, setQuote] = useState('');
   const navigate = useNavigate();
 
-  // Set a random quote on mount
   useEffect(() => {
     setQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
   }, []);
 
-  // Autofocus first input
   useEffect(() => {
     const firstInput = document.getElementById('username');
     if (firstInput) {
@@ -66,7 +57,6 @@ function RegisterPage() {
     }
   }, []);
 
-  // Calculate password strength (example logic)
   const passwordStrength = useMemo(() => {
     if (password.length === 0) return '';
     let strength = 'weak';
@@ -83,7 +73,6 @@ function RegisterPage() {
     setError('');
     setIsLoading(true);
 
-    // --- Basic Validation ---
     if (!username || !email || !password || !confirmPassword) {
         setError('Please fill in all required fields.');
         setIsLoading(false);
@@ -104,16 +93,12 @@ function RegisterPage() {
        setIsLoading(false);
       return;
     }
-    // --- End Validation ---
 
-    // Simulate API call
     setTimeout(() => {
       console.log('Attempting registration with:', { username, email, password, fitnessLevel, agreeTerms });
-      // Mock success
       console.log('Registration successful');
       setIsLoading(false);
-      // In Day 2, we might update AuthContext immediately or just redirect to login
-      navigate('/login?registered=true'); // Redirect to login page with a success indicator (optional)
+      navigate('/login?registered=true');
     }, 1500);
   };
 
@@ -121,14 +106,12 @@ function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 via-teal-100 to-blue-100 px-4 py-8">
       <div className="bg-white p-8 sm:p-10 rounded-xl shadow-xl w-full max-w-md">
-        {/* Rotating Quote */}
          {quote && <p className="text-center text-sm italic text-gray-500 mb-6">"{quote}"</p>}
 
         <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
           Create Your Account
         </h2>
 
-         {/* Display Error */}
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-sm" role="alert">
             <span className="block sm:inline">{error}</span>
@@ -143,7 +126,7 @@ function RegisterPage() {
               type="text" id="username" value={username}
               onChange={(e) => setUsername(e.target.value)}
               required placeholder="Choose a username" autoComplete="username"
-              className="invalid:border-red-500" // Example styling for invalid state
+              className="invalid:border-red-500"
             />
           </div>
 
@@ -158,7 +141,7 @@ function RegisterPage() {
             />
           </div>
 
-          <div className="mb-2"> {/* Reduced margin bottom */}
+          <div className="mb-2"> 
             <label htmlFor="reg-password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <PasswordInput
               icon={<FiLock />}
@@ -168,18 +151,17 @@ function RegisterPage() {
               className="invalid:border-red-500"
             />
           </div>
-          {/* Password Strength Meter */}
           <PasswordStrengthMeter strength={passwordStrength} />
 
 
-          <div className="mt-4 mb-4"> {/* Add margin top */}
+          <div className="mt-4 mb-4"> 
             <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
             <PasswordInput
               icon={<FiLock />}
               id="confirm-password" value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required placeholder="Re-enter your password" autoComplete="new-password"
-              className={password && confirmPassword && password !== confirmPassword ? 'border-red-500' : ''} // Highlight if mismatch
+              className={password && confirmPassword && password !== confirmPassword ? 'border-red-500' : ''}
             />
              {password && confirmPassword && password !== confirmPassword && (
                 <p className="text-xs text-red-600 mt-1">Passwords do not match.</p>
@@ -256,10 +238,6 @@ function RegisterPage() {
   );
 }
 
-// Consider moving InputWithIcon and PasswordInput to a shared components file
-// e.g., src/components/common/FormInputs.jsx and exporting them from there.
-
-// Simple reusable Input component with icon support (copied here for standalone example)
 const InputWithIcon = ({ icon, type = 'text', ...props }) => (
     <div className="relative">
       <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
@@ -273,7 +251,6 @@ const InputWithIcon = ({ icon, type = 'text', ...props }) => (
     </div>
   );
 
-// Password input with visibility toggle (copied here for standalone example)
 const PasswordInput = ({ icon, value, onChange, id = 'password', ...props }) => {
     const [showPassword, setShowPassword] = useState(false);
     return (

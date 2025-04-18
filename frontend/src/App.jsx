@@ -5,8 +5,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 // Layouts & Auth
 import AppLayout from './components/layout/AppLayout.jsx';
 import AdminLayout from './components/layout/AdminLayout.jsx';
-import GuestLayout from './components/layout/GuestLayout.jsx'; // Keep for direct use if needed later? Or remove if unused.
-import ConditionalLayoutWrapper from './components/layout/ConditionalLayoutWrapper.jsx'; // <-- Import Wrapper
+import GuestLayout from './components/layout/GuestLayout.jsx'; 
+import ConditionalLayoutWrapper from './components/layout/ConditionalLayoutWrapper.jsx'; 
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 
 // Page Components
@@ -38,8 +38,6 @@ function App() {
       <Route path="/register" element={<RegisterPage />} />
 
 
-      {/* --- User Routes (Requires Login, Uses AppLayout) --- */}
-      {/* These routes are ONLY for logged-in users and ALWAYS use AppLayout */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
@@ -50,22 +48,17 @@ function App() {
           <Route path="/workout-plans" element={<WorkoutPlansPage />} />
           <Route path="/calculators" element={<CalculatorsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          {/* Exercises & Recipes are NOT defined here anymore */}
         </Route>
       </Route>
 
 
-       {/* --- Shared Routes (Uses Conditional Layout based on Auth) --- */}
-       {/* These routes use a wrapper to decide between AppLayout and GuestLayout */}
       <Route element={<ConditionalLayoutWrapper />}>
         <Route path="/exercises" element={<InteractiveExercisesPage />} />
         <Route path="/recipes" element={<RecipesPage />} />
         <Route path="/recipes/:recipeId" element={<RecipeDetailPage />} />
       </Route>
-      {/* --- End Shared Routes --- */}
 
 
-      {/* --- Admin Routes (Requires Login + Admin Role, Uses AdminLayout) --- */}
       <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="/admin/users" replace />} />
@@ -75,11 +68,9 @@ function App() {
       </Route>
 
 
-      {/* --- Default Route --- */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
 
-      {/* --- Not Found Route --- */}
       <Route path="*" element={<NotFoundPage />} />
 
     </Routes>

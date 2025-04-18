@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  // Try to load user from localStorage on initial load
   const [user, setUser] = useState(() => {
       try {
           const savedUser = localStorage.getItem('authUser');
@@ -17,7 +16,6 @@ export const AuthProvider = ({ children }) => {
   });
   const navigate = useNavigate();
 
-  // Save user to localStorage whenever it changes
   useEffect(() => {
       try {
           if (user) {
@@ -35,17 +33,11 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     console.log('AuthContext: Logging in user', userData);
     setUser(userData);
-    // Navigation is now handled by ProtectedRoute or LoginPage logic after state update
-    // Optional: Navigate immediately if desired, but state propagation is key
-    // const destination = userData.role === 'Admin' ? '/admin' : '/dashboard';
-    // navigate(destination);
   };
 
-  // Logout function - clears state and localStorage
   const logout = () => {
     console.log('AuthContext: Logging out');
     setUser(null);
-    // No need to remove from localStorage here, useEffect handles it
     navigate('/login'); // Redirect to login page after logout
   };
 
