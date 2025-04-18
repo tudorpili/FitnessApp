@@ -3,11 +3,13 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts & Auth
-import AppLayout from './components/layout/AppLayout.jsx'; // Use .jsx
-import AdminLayout from './components/layout/AdminLayout.jsx'; // Use .jsx
-import ProtectedRoute from './components/auth/ProtectedRoute.jsx'; // <-- Import ProtectedRoute
+import AppLayout from './components/layout/AppLayout.jsx';
+import AdminLayout from './components/layout/AdminLayout.jsx';
+import GuestLayout from './components/layout/GuestLayout.jsx'; // Keep for direct use if needed later? Or remove if unused.
+import ConditionalLayoutWrapper from './components/layout/ConditionalLayoutWrapper.jsx'; // <-- Import Wrapper
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 
-// Page Components (Ensure all have .jsx extension)
+// Page Components
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import InteractiveExercisesPage from './pages/InteractiveExercisesPage.jsx';
@@ -18,12 +20,12 @@ import TrackCaloriesPage from './pages/TrackCaloriesPage.jsx';
 import LogMealPage from './pages/LogMealPage.jsx';
 import WorkoutPlansPage from './pages/WorkoutPlansPage.jsx';
 import SettingsPage from './pages/SettingsPage.jsx';
-//import ActivityLogPage from './pages/ActivityLogPage.jsx'; // <-- Placeholder Component
+//import ActivityLogPage from './pages/ActivityLogPage.jsx';
 import CalculatorsPage from './pages/CalculatorsPage.jsx';
 import RecipesPage from './pages/RecipesPage.jsx';
 import RecipeDetailPage from './pages/RecipeDetailPage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
-import AdminExercisesPage from './pages/AdminExercisesPage.jsx'; // <-- Placeholder Component
+import AdminExercisesPage from './pages/AdminExercisesPage.jsx';
 
 const NotFoundPage = () => <div className="p-4">404 - Page Not Found</div>;
 
@@ -31,53 +33,53 @@ const NotFoundPage = () => <div className="p-4">404 - Page Not Found</div>;
 function App() {
   return (
     <Routes>
-      {/* --- Public Routes --- */}
-      {/* Accessible by everyone */}
+      {/* --- Public Auth Routes (No Layout) --- */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* --- User Routes (Requires Login) --- */}
-      {/* Wrap the entire user section with ProtectedRoute */}
-      <Route element={<ProtectedRoute />}> {/* Checks if user is authenticated */}
-        <Route element={<AppLayout />}> {/* Apply AppLayout to nested routes */}
-          {/* Default route for logged-in users */}
+
+      {/* --- User Routes (Requires Login, Uses AppLayout) --- */}
+      {/* These routes are ONLY for logged-in users and ALWAYS use AppLayout */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
-          {/* Other user routes */}
           <Route path="/log-workout" element={<LogWorkoutPage />} />
           <Route path="/track-weight" element={<TrackWeightPage />} />
           <Route path="/track-calories" element={<TrackCaloriesPage />} />
           <Route path="/log-meal" element={<LogMealPage />} />
-          <Route path="/exercises" element={<InteractiveExercisesPage />} />
           <Route path="/workout-plans" element={<WorkoutPlansPage />} />
           <Route path="/calculators" element={<CalculatorsPage />} />
-          <Route path="/recipes" element={<RecipesPage />} />
-          <Route path="/recipes/:recipeId" element={<RecipeDetailPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          {/* Add other user-specific routes here */}
+          {/* Exercises & Recipes are NOT defined here anymore */}
         </Route>
       </Route>
 
 
-      {/* --- Admin Routes (Requires Login + Admin Role) --- */}
-       {/* Wrap the entire admin section with ProtectedRoute, specifying allowedRoles */}
-      <Route element={<ProtectedRoute allowedRoles={['Admin']} />}> {/* Checks auth AND role */}
-        <Route path="/admin" element={<AdminLayout />}> {/* Apply AdminLayout */}
-          <Route index element={<Navigate to="/admin/users" replace />} /> {/* Default admin route */}
+       {/* --- Shared Routes (Uses Conditional Layout based on Auth) --- */}
+       {/* These routes use a wrapper to decide between AppLayout and GuestLayout */}
+      <Route element={<ConditionalLayoutWrapper />}>
+        <Route path="/exercises" element={<InteractiveExercisesPage />} />
+        <Route path="/recipes" element={<RecipesPage />} />
+        <Route path="/recipes/:recipeId" element={<RecipeDetailPage />} />
+      </Route>
+      {/* --- End Shared Routes --- */}
+
+
+      {/* --- Admin Routes (Requires Login + Admin Role, Uses AdminLayout) --- */}
+      <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Navigate to="/admin/users" replace />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="exercises" element={<AdminExercisesPage />} />
-          {/* Add other admin routes like /admin/content etc. here */}
         </Route>
       </Route>
 
 
       {/* --- Default Route --- */}
-      {/* Redirect root path. If user is logged in, ProtectedRoute on /dashboard will handle it. */}
-      {/* If not logged in, ProtectedRoute will redirect from /dashboard to /login. */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
 
       {/* --- Not Found Route --- */}
-      {/* This will catch any route not defined above */}
       <Route path="*" element={<NotFoundPage />} />
 
     </Routes>

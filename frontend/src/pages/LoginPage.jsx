@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 // Removed useLocation as it's no longer needed for this logic
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext.jsx';
-import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn } from 'react-icons/fi';
+// Added FiUserCheck back for the guest button
+import { FiMail, FiLock, FiEye, FiEyeOff, FiLogIn, FiUserCheck } from 'react-icons/fi';
 import { FaGoogle, FaGithub } from 'react-icons/fa';
 
 // Input Components
@@ -29,24 +30,14 @@ function LoginPage() {
     }
   }, [isAuthenticated]);
 
-  // --- MODIFIED: useEffect for handling redirection (Simplified) ---
+  // Redirect effect
   useEffect(() => {
-      // Redirect only if authentication is successful AND we have the user object
       if (isAuthenticated && user) {
-          // --- Simplified Destination Logic ---
-          // Always redirect based purely on role after login
           const destination = user.role === 'Admin' ? '/admin' : '/dashboard';
-          // --- End Simplification ---
-
           console.log(`[LoginPage] useEffect: Auth=true, User Role='${user.role}'. Navigating to: ${destination}`);
-          // Use requestAnimationFrame to slightly delay navigation, ensuring state is settled
-          requestAnimationFrame(() => {
-            navigate(destination, { replace: true });
-          });
+          requestAnimationFrame(() => { navigate(destination, { replace: true }); });
       }
-  // Update dependencies - location.state is removed
   }, [isAuthenticated, user, navigate]);
-  // --- END MODIFICATION ---
 
 
   const handleSubmit = (event) => {
@@ -88,16 +79,31 @@ function LoginPage() {
   return (
      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 px-4 py-8">
       <div className={formClasses}>
-         {/* ... Form content ... */}
          <h2 className="text-3xl font-bold mb-2 text-center text-gray-800">Welcome Back!</h2>
-         <p className="text-center text-gray-600 mb-8">Login to continue your fitness journey.</p>
+         <p className="text-center text-gray-600 mb-8">Login or continue as guest.</p>
          {error && ( <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-sm" role="alert"><span className="block sm:inline">{error}</span></div> )}
          <form onSubmit={handleSubmit} noValidate>
-           <div className="mb-5"><label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label><InputWithIcon icon={<FiMail />} type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="user@app.com / admin@app.com" autoComplete="email"/></div>
-           <div className="mb-4"><label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-1">Password</label><PasswordInput icon={<FiLock />} id="login-password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="password" autoComplete="current-password"/></div>
-           <div className="flex items-center justify-between mb-6 text-sm"><div className="flex items-center"><input id="remember-me" name="remember-me" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"/><label htmlFor="remember-me" className="ml-2 block text-gray-900">Remember me</label></div><a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 hover:underline">Forgot password?</a></div>
-           <button type="submit" disabled={isLoading} className={`w-full flex justify-center items-center bg-indigo-600 text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 shadow-md disabled:opacity-50 disabled:cursor-not-allowed`}>{isLoading ? ( <><svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Logging in...</> ) : ( <><FiLogIn className="mr-2" /> Login</> )}</button>
+            {/* ... Form inputs ... */}
+            <div className="mb-5"><label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email Address</label><InputWithIcon icon={<FiMail />} type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="user@app.com / admin@app.com" autoComplete="email"/></div>
+            <div className="mb-4"><label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-1">Password</label><PasswordInput icon={<FiLock />} id="login-password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="password" autoComplete="current-password"/></div>
+            <div className="flex items-center justify-between mb-6 text-sm"><div className="flex items-center"><input id="remember-me" name="remember-me" type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"/><label htmlFor="remember-me" className="ml-2 block text-gray-900">Remember me</label></div><a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 hover:underline">Forgot password?</a></div>
+            <button type="submit" disabled={isLoading} className={`w-full flex justify-center items-center bg-indigo-600 text-white py-2.5 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105 shadow-md disabled:opacity-50 disabled:cursor-not-allowed`}>{isLoading ? ( <><svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Logging in...</> ) : ( <><FiLogIn className="mr-2" /> Login</> )}</button>
          </form>
+
+         {/* --- RE-ADD GUEST BUTTON AND SEPARATOR --- */}
+         <div className="my-4 flex items-center">
+           <div className="flex-grow border-t border-gray-300"></div><span className="flex-shrink mx-4 text-gray-500 text-xs font-semibold">OR</span><div className="flex-grow border-t border-gray-300"></div>
+         </div>
+         <button
+            type="button"
+            onClick={() => navigate('/exercises')} // Navigate to exercises page for guests
+            className="w-full flex justify-center items-center bg-white text-gray-700 py-2.5 px-4 rounded-lg font-semibold border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-200 ease-in-out shadow-sm"
+          >
+            <FiUserCheck className="mr-2" /> {/* Icon for Guest */}
+            Continue as Guest
+          </button>
+         {/* --- END RE-ADD --- */}
+
          <p className="mt-6 text-center text-sm text-gray-600">Don't have an account yet?{' '}<Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500 hover:underline">Register here</Link></p>
          <div className="my-6 flex items-center"><div className="flex-grow border-t border-gray-300"></div><span className="flex-shrink mx-4 text-gray-500 text-sm">Or login with</span><div className="flex-grow border-t border-gray-300"></div></div>
          <div className="flex justify-center space-x-4"><button aria-label="Login with Google" className="p-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-100 transition duration-150"><FaGoogle size={20} /></button><button aria-label="Login with Github" className="p-2 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-100 transition duration-150"><FaGithub size={20} /></button></div>

@@ -1,7 +1,8 @@
 // src/pages/InteractiveExercisesPage.jsx
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { FiInfo, FiLogIn, FiUserPlus, FiTrash2 } from 'react-icons/fi'; // Added FiTrash2
+// Removed FiInfo, FiLogIn, FiUserPlus as they are no longer needed here
+import { FiTrash2, FiX } from 'react-icons/fi';
 
 // Correct the import path if you placed Illustration.jsx in src/components/Muscles/
 import Illustration from '../components/Muscles/Illustration';
@@ -23,7 +24,6 @@ function InteractiveExercisesPage() {
   const exerciseCountForMuscles = useMemo(() => {
     const musclesWithExercises = new Set();
     mockExercises.forEach(ex => {
-      // Ensure muscle property exists and is truthy
       if (ex.muscle) {
         musclesWithExercises.add(ex.muscle);
       }
@@ -42,22 +42,20 @@ function InteractiveExercisesPage() {
   }, [selectedMuscles]);
 
   return (
-    // Apply consistent page background and font
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-indigo-50 to-purple-100 py-10 sm:py-16 font-sans">
-      {/* Increased overall padding */}
-      <div className="container mx-auto px-6 lg:px-8">
+    // Apply consistent page background and font - Background is now handled by Layout, removed gradient here
+    <div className="font-sans animate-fadeIn"> {/* Added entry animation */}
+      {/* Container (padding is now handled by Layout) */}
+      {/* <div className="container mx-auto px-6 lg:px-8"> */}
 
-        {/* Guest Call to Action Header - Refined style */}
-        <div className="mb-10 p-5 bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-2xl shadow-lg flex flex-col sm:flex-row justify-between items-center gap-4">
-           {/* ... (Header content remains largely the same, maybe adjust text/button styles) ... */}
-            <div className="flex items-center text-center sm:text-left"> <FiInfo className="text-3xl mr-4 flex-shrink-0 hidden sm:block" /> <div> <p className="font-semibold tracking-wide"> Click highlighted body parts to filter exercises. </p> <p className="text-sm text-blue-100 tracking-wide"> {selectedMuscles.length > 0 ? `Showing: ${selectedMuscles.join(', ')}` : 'Showing all exercises.'} </p> </div> </div> <div className="flex gap-3 flex-shrink-0"> <Link to="/login" className="flex items-center bg-white text-blue-700 text-sm font-semibold py-2 px-4 rounded-lg hover:bg-blue-50 transition duration-200 shadow hover:shadow-md transform hover:-translate-y-0.5"> <FiLogIn className="mr-1.5" /> Login </Link> <Link to="/register" className="flex items-center bg-purple-200 text-purple-800 text-sm font-semibold py-2 px-4 rounded-lg hover:bg-purple-300 transition duration-200 shadow hover:shadow-md transform hover:-translate-y-0.5"> <FiUserPlus className="mr-1.5" /> Sign Up </Link> </div>
-         </div>
+        {/* --- REMOVED Guest Call to Action Header --- */}
+        {/* <div className="mb-10 p-5 bg-gradient-to-r from-blue-600 to-purple-700 ..."> ... </div> */}
+        {/* --- END REMOVAL --- */}
 
         {/* Main Content Area: Increased gap */}
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-12">
 
           {/* Left Side: Interactive SVG */}
-          {/* --- MODIFIED: Added lg: prefix to sticky and top- classes --- */}
+          {/* Sticky behavior applied only on large screens */}
           <div className="w-full lg:w-1/3 lg:max-w-sm flex-shrink-0 self-start lg:sticky lg:top-6">
              {/* Applied consistent card styling */}
              <div className="bg-white/70 backdrop-blur-lg p-5 sm:p-6 rounded-2xl shadow-xl">
@@ -75,7 +73,6 @@ function InteractiveExercisesPage() {
                             {selectedMuscles.map(muscle => (
                                 <span key={muscle} className="inline-flex items-center bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow">
                                     {muscle}
-                                     {/* Optional: Add remove button per muscle */}
                                      <button onClick={() => toggleMuscle(muscle)} className="ml-1.5 -mr-0.5 text-red-100 hover:text-white opacity-70 hover:opacity-100"><FiX size={12} /></button>
                                 </span>
                             ))}
@@ -89,19 +86,17 @@ function InteractiveExercisesPage() {
                 </div>
              </div>
           </div>
-          {/* --- END MODIFICATION --- */}
-
 
           {/* Right Side: Exercise List */}
           <div className="w-full lg:w-2/3">
-             <h2 className="text-3xl font-extrabold mb-8 text-gray-900 tracking-tight"> {/* Larger heading */}
+             {/* Added top margin for spacing, removed background */}
+             <h2 className="text-3xl font-extrabold mb-8 text-gray-900 tracking-tight mt-2 lg:mt-0">
               {selectedMuscles.length > 0 ? `Exercises for ${selectedMuscles.join(' & ')}` : 'All Exercises'}
               <span className="text-lg font-medium text-gray-500 ml-3">({filteredExercises.length} found)</span>
             </h2>
             {/* Use enhanced ExerciseCard component */}
             {filteredExercises.length > 0 ? (
-              // Adjusted grid columns for potentially 4-wide on largest screens
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 animate-fadeIn">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
                 {filteredExercises.map(exercise => (
                   <ExerciseCard key={exercise.id} exercise={exercise} />
                 ))}
@@ -118,8 +113,8 @@ function InteractiveExercisesPage() {
             )}
           </div>
         </div>
-      </div>
-    </div>
+      {/* </div> End Container */}
+    </div> // End Page div
   );
 }
 
