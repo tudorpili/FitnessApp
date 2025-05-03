@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   });
   const navigate = useNavigate();
 
+  // Save user to localStorage
   useEffect(() => {
       try {
           if (user) {
@@ -35,16 +36,20 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
+  // --- MODIFIED: Logout function ---
   const logout = () => {
     console.log('AuthContext: Logging out');
-    setUser(null);
-    navigate('/login'); // Redirect to login page after logout
+    setUser(null); // Clear user state
+    localStorage.removeItem('authToken'); // <-- Remove token from storage
+    // localStorage.removeItem('authUser'); // This happens automatically via useEffect
+    navigate('/login'); // Redirect to login page
   };
+  // --- END MODIFICATION ---
 
   const value = {
     user,
     isAuthenticated: !!user,
-    isAdmin: user?.role === 'Admin', // Helper flag for admin role
+    isAdmin: user?.role === 'Admin',
     login,
     logout,
   };
@@ -52,7 +57,7 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook remains the same
+// Custom hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
