@@ -5,32 +5,40 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 
 dotenv.config();
-require('./src/config/db.js');
+require('./src/config/db.js'); // Ensure path is correct
 
-// Import route handlers
+// --- Import Route Handlers ---
 const exerciseRoutes = require('./src/routes/exerciseRoutes');
-const authRoutes = require('./src/routes/authRoutes'); // <-- Import Auth Routes
+const authRoutes = require('./src/routes/authRoutes');
+const recipeRoutes = require('./src/routes/recipeRoutes');
+const foodRoutes = require('./src/routes/foodRoutes');
+const workoutLogRoutes = require('./src/routes/workoutLogRoutes');
+const weightLogRoutes = require('./src/routes/weightLogRoutes'); // <-- Import Weight Log Routes
 // const userRoutes = require('./src/routes/userRoutes');
 
 const app = express();
 
-// Middleware
+// --- Middleware ---
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Basic Routes
-app.get('/', (req, res) => { /* ... */ res.status(200).json({ message: 'Welcome!' }); });
+// --- Basic Root Route ---
+app.get('/', (req, res) => { /* ... */ });
 
-// Mount API routes
+// --- Mount API Routes ---
+app.use('/api/auth', authRoutes);
 app.use('/api/exercises', exerciseRoutes);
-app.use('/api/auth', authRoutes); // <-- Mount Auth Routes under /api/auth
+app.use('/api/recipes', recipeRoutes);
+app.use('/api/foods', foodRoutes);
+app.use('/api/workouts', workoutLogRoutes);
+app.use('/api/weight', weightLogRoutes); // <-- Mount Weight Log Routes under /api/weight
 // app.use('/api/users', userRoutes);
 
+// --- Error Handling Middleware ---
+app.use((err, req, res, next) => { /* ... */ });
 
-// Error Handling (Basic Placeholder)
-// app.use((err, req, res, next) => { ... });
-
-// Server Startup
+// --- Server Startup ---
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => { console.log(`--------------------------------------------------`); console.log(`🚀 Backend server running on port ${PORT}`); console.log(`   Access API at http://localhost:${PORT}`); console.log(`--------------------------------------------------`); });
+app.listen(PORT, () => { /* ... */ });
+
