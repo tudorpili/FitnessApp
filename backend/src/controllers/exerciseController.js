@@ -1,65 +1,158 @@
-// backend/src/controllers/exerciseController.js
+// src/controllers/exerciseController.js
+const Exercise = require('../models/Exercise');
 
-// --- MODIFICAT: Importam Modelul Exercise ---
-const Exercise = require('../models/Exercise.js'); // Ajusteaza calea daca e necesar
-// --- END MODIFICAT ---
+const exerciseController = {
+  /**
+   * Handles GET request to fetch all exercises. Public endpoint.
+   */
+  getAllExercises: async (req, res) => {
+    try {
+      const exercises = await Exercise.findAll();
+      res.status(200).json(exercises);
+    } catch (error) {
+      console.error('Error in getAllExercises controller:', error);
+      res.status(500).json({ message: 'Error fetching exercises', error: error.message });
+    }
+  },
 
-// Controller function to get all exercises
-const getAllExercises = async (req, res, next) => {
-  console.log('[Controller] Received request for getAllExercises');
-  try {
-    // --- MODIFICAT: Apelam functia din model ---
-    const exercises = await Exercise.findAll();
-    // --- END MODIFICAT ---
+  /**
+   * Handles GET request to fetch a single exercise by ID. Public endpoint.
+   */
+  getExerciseById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const exerciseId = parseInt(id, 10);
+      if (isNaN(exerciseId)) {
+        return res.status(400).json({ message: 'Invalid exercise ID format.' });
+      }
+      const exercise = await Exercise.findById(exerciseId);
+      if (exercise) {
+        res.status(200).json(exercise);
+      } else {
+        res.status(404).json({ message: `Exercise with ID ${exerciseId} not found.` });
+      }
+    } catch (error) {
+      console.error('Error in getExerciseById controller:', error);
+      res.status(500).json({ message: 'Error fetching exercise', error: error.message });
+    }
+  },
 
-    console.log(`[Controller] Sending ${exercises.length} exercises.`);
-    res.status(200).json(exercises);
+  /**
+   * Handles POST request to create a new exercise. Requires Admin role.
+   */
+  createExercise: async (req, res) => {
+    try {
+      // Assumes isAdmin middleware ran and verified role, or check here:
+      // if (!req.user || req.user.role !== 'Admin') {
+      //   return res.status(403).json({ message: 'Forbidden: Admin privileges required.' });
+      // }
 
-  } catch (error) {
-    console.error('[Controller] Error in getAllExercises:', error);
-    // Optional: trimite eroarea catre un middleware de erori centralizat
-    // next(error);
-    res.status(500).json({ message: 'Error fetching exercises.' }); // Trimite un raspuns de eroare generic
+      const exerciseData = req.body;
+
+      // Basic Validation
+      if (!exerciseData.name || !exerciseData.name.trim()) {
+        return res.status(400).json({ message: 'Exercise name is required.' });
+      }
+      // Ensure videos is an array if provided
+      if (exerciseData.videos && !Array.isArray(exerciseData.videos)) {
+         try {
+             // Attempt to parse if it's a string, otherwise default to empty array
+             exerciseData.videos = JSON.parse(exerciseData.videos);
+             if (!Array.isArray(exerciseData.videos)) exerciseData.videos = [];
+         } catch (e) {
+             exerciseData.videos = []; // Default to empty if parsing fails
+         }
+      } else if (!exerciseData.videos) {
+          exerciseData.videos = []; // Default to empty array if not provided
+      }
+
+
+      const newExercise = await Exercise.create(exerciseData);
+      res.status(201).json({ message: 'Exercise created successfully!', exercise: newExercise });
+
+    } catch (error) {
+      console.error('Error in createExercise controller:', error);
+       // Handle potential duplicate name error from model
+      if (error.message.includes('already exists')) {
+           return res.status(409).json({ message: error.message }); // 409 Conflict
+      }
+      res.status(500).json({ message: 'Error creating exercise', error: error.message });
+    }
+  },
+
+  /**
+   * Handles PUT request to update an existing exercise. Requires Admin role.
+   */
+  updateExercise: async (req, res) => {
+    try {
+      // Assumes isAdmin middleware ran and verified role
+
+      const { id } = req.params;
+      const exerciseId = parseInt(id, 10);
+      const exerciseData = req.body;
+
+      if (isNaN(exerciseId)) {
+        return res.status(400).json({ message: 'Invalid exercise ID format.' });
+      }
+      if (!exerciseData.name || !exerciseData.name.trim()) {
+        return res.status(400).json({ message: 'Exercise name is required.' });
+      }
+       // Ensure videos is an array if provided
+      if (exerciseData.videos && !Array.isArray(exerciseData.videos)) {
+         try {
+             exerciseData.videos = JSON.parse(exerciseData.videos);
+             if (!Array.isArray(exerciseData.videos)) exerciseData.videos = [];
+         } catch (e) {
+             exerciseData.videos = [];
+         }
+      } else if (!exerciseData.videos) {
+          exerciseData.videos = [];
+      }
+
+      const updatedExercise = await Exercise.update(exerciseId, exerciseData);
+
+      if (updatedExercise) {
+        res.status(200).json({ message: 'Exercise updated successfully!', exercise: updatedExercise });
+      } else {
+        // Exercise not found
+        res.status(404).json({ message: `Exercise with ID ${exerciseId} not found.` });
+      }
+    } catch (error) {
+      console.error('Error in updateExercise controller:', error);
+      if (error.message.includes('already exists')) {
+           return res.status(409).json({ message: error.message }); // 409 Conflict
+      }
+      res.status(500).json({ message: 'Error updating exercise', error: error.message });
+    }
+  },
+
+  /**
+   * Handles DELETE request to remove an exercise. Requires Admin role.
+   */
+  deleteExercise: async (req, res) => {
+    try {
+       // Assumes isAdmin middleware ran and verified role
+
+      const { id } = req.params;
+      const exerciseId = parseInt(id, 10);
+
+      if (isNaN(exerciseId)) {
+        return res.status(400).json({ message: 'Invalid exercise ID format.' });
+      }
+
+      const success = await Exercise.deleteById(exerciseId);
+
+      if (success) {
+        res.status(200).json({ message: `Exercise ${exerciseId} deleted successfully.` });
+        // Or res.status(204).send();
+      } else {
+        res.status(404).json({ message: `Exercise with ID ${exerciseId} not found.` });
+      }
+    } catch (error) {
+      console.error('Error in deleteExercise controller:', error);
+      res.status(500).json({ message: 'Error deleting exercise', error: error.message });
+    }
   }
 };
 
-// Controller function to get a single exercise by ID
-const getExerciseById = async (req, res, next) => {
-    const exerciseId = req.params.id;
-    console.log(`[Controller] Received request for getExerciseById: ${exerciseId}`);
-    try {
-        // --- MODIFICAT: Apelam functia din model ---
-        const exercise = await Exercise.findById(exerciseId);
-        // --- END MODIFICAT ---
-
-        if (!exercise) {
-             console.log(`[Controller] Exercise ${exerciseId} not found.`);
-            // Daca modelul returneaza null, trimitem 404 Not Found
-            return res.status(404).json({ message: 'Exercise not found.' });
-        }
-        console.log(`[Controller] Sending exercise ${exerciseId}.`);
-        res.status(200).json(exercise); // Trimitem exercitiul gasit
-
-    } catch (error) {
-        console.error(`[Controller] Error in getExerciseById (${exerciseId}):`, error);
-        res.status(500).json({ message: 'Error fetching exercise.' });
-    }
-};
-
-
-// --- Add more controller functions later ---
-// const createExercise = async (req, res, next) => {
-//      try {
-//          const newExercise = await Exercise.create(req.body);
-//          res.status(201).json(newExercise);
-//      } catch (error) { ... }
-// };
-// ... etc ...
-
-
-// Exportam functiile controller-ului
-module.exports = {
-  getAllExercises,
-  getExerciseById,
-  // Export other functions as you create them
-};
+module.exports = exerciseController;

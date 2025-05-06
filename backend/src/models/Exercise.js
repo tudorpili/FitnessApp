@@ -1,73 +1,140 @@
-// backend/src/models/Exercise.js
+// src/models/Exercise.js
+const db = require('../config/db'); // Adjust path if needed
 
-// Importam pool-ul de conexiuni la baza de date
-const dbPool = require('../config/db.js');
-
-// Modelul Exercise - un obiect sau clasa care grupeaza operatiunile pe baza de date
 const Exercise = {
-
   /**
-   * Gaseste toate exercitiile din baza de date.
-   * @returns {Promise<Array>} Un array cu obiecte reprezentand exercitiile.
-   * @throws {Error} Arunca eroare daca interogarea esueaza.
+   * Finds all exercises.
+   * @returns {Promise<Array>} Array of exercise objects.
    */
-  async findAll() {
+  findAll: async () => {
+    const sql = 'SELECT * FROM exercises ORDER BY name ASC'; // Added default ordering
     try {
-      // Executam interogarea SQL pentru a selecta toate exercitiile
-      const query = 'SELECT * FROM exercises ORDER BY name ASC';
-      console.log('[Exercise Model] Executing query:', query);
-      const [results] = await dbPool.query(query);
-      console.log(`[Exercise Model] Found ${results.length} exercises.`);
-      return results;
+      const [rows] = await db.query(sql);
+      return rows;
     } catch (error) {
-      console.error('[Exercise Model] Error in findAll:', error);
-      // Aruncam eroarea mai departe pentru a fi prinsa de controller
+      console.error('Error fetching all exercises:', error);
       throw error;
     }
   },
 
   /**
-   * Gaseste un exercitiu specific dupa ID.
-   * @param {number|string} id - ID-ul exercitiului cautat.
-   * @returns {Promise<Object|null>} Obiectul exercitiu sau null daca nu este gasit.
-   * @throws {Error} Arunca eroare daca interogarea esueaza.
+   * Finds a single exercise by its ID.
+   * @param {number} id - The ID of the exercise.
+   * @returns {Promise<object|null>} The exercise object or null if not found.
    */
-  async findById(id) {
+  findById: async (id) => {
+    const sql = 'SELECT * FROM exercises WHERE id = ?';
     try {
-      // Folosim un placeholder (?) pentru a preveni SQL injection
-      const query = 'SELECT * FROM exercises WHERE id = ?'; // Asigura-te ca `id` este numele coloanei tale PK
-      console.log('[Exercise Model] Executing query:', query, [id]);
-      const [results] = await dbPool.query(query, [id]);
+      const [rows] = await db.query(sql, [id]);
+      return rows.length > 0 ? rows[0] : null;
+    } catch (error) {
+      console.error(`Error fetching exercise with id ${id}:`, error);
+      throw error;
+    }
+  },
 
-      if (results.length > 0) {
-        console.log(`[Exercise Model] Found exercise with ID: ${id}`);
-        return results[0]; // Returnam primul (si singurul) rezultat
-      } else {
-        console.log(`[Exercise Model] Exercise with ID ${id} not found.`);
-        return null; // Nu s-a gasit exercitiul
+  /**
+   * Creates a new exercise.
+   * @param {object} exerciseData - Data for the new exercise.
+   * Expected fields: name, description, muscle, difficulty, equipment, image_url, videos (array)
+   * @returns {Promise<object>} The newly created exercise object.
+   */
+  create: async (exerciseData) => {
+    const {
+      name, description, muscle, difficulty, equipment, image_url, videos // videos is expected as an array
+    } = exerciseData;
+
+    // Convert videos array to JSON string for storage
+    const videosJson = JSON.stringify(videos || []);
+
+    const sql = `
+      INSERT INTO exercises (name, description, muscle, difficulty, equipment, image_url, videos)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [
+      name, description || null, muscle || null, difficulty || null,
+      equipment || null, image_url || null, videosJson
+    ];
+
+    try {
+      const [result] = await db.query(sql, values);
+      const insertId = result.insertId;
+      if (!insertId) {
+        throw new Error('Exercise creation failed, no insert ID returned.');
       }
+      // Fetch and return the newly created exercise
+      return await Exercise.findById(insertId);
     } catch (error) {
-      console.error(`[Exercise Model] Error in findById (${id}):`, error);
+      console.error('Error creating exercise:', error);
+      // Handle specific errors like duplicate name if 'name' has a UNIQUE constraint
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new Error(`An exercise with the name "${name}" already exists.`);
+      }
       throw error;
     }
   },
 
-  // --- Adauga aici alte functii pentru Model (Create, Update, Delete) ---
-  /*
-  async create(exerciseData) {
-    // Logica pentru INSERT INTO exercises...
+  /**
+   * Updates an existing exercise.
+   * @param {number} id - The ID of the exercise to update.
+   * @param {object} exerciseData - Data fields to update.
+   * @returns {Promise<object|null>} The updated exercise object or null if not found.
+   */
+  update: async (id, exerciseData) => {
+    const {
+      name, description, muscle, difficulty, equipment, image_url, videos
+    } = exerciseData;
+
+     // Convert videos array to JSON string for storage
+    const videosJson = JSON.stringify(videos || []);
+
+    const sql = `
+      UPDATE exercises SET
+        name = ?, description = ?, muscle = ?, difficulty = ?,
+        equipment = ?, image_url = ?, videos = ?
+      WHERE id = ?
+    `;
+    const values = [
+      name, description || null, muscle || null, difficulty || null,
+      equipment || null, image_url || null, videosJson,
+      id // For the WHERE clause
+    ];
+
+    try {
+      const [result] = await db.query(sql, values);
+      if (result.affectedRows === 0) {
+        return null; // Exercise with the given ID not found
+      }
+      // Fetch and return the updated exercise
+      return await Exercise.findById(id);
+    } catch (error) {
+      console.error(`Error updating exercise with id ${id}:`, error);
+       if (error.code === 'ER_DUP_ENTRY') {
+        throw new Error(`An exercise with the name "${name}" already exists.`);
+      }
+      throw error;
+    }
   },
 
-  async update(id, exerciseData) {
-    // Logica pentru UPDATE exercises SET ... WHERE id = ?
-  },
-
-  async delete(id) {
-    // Logica pentru DELETE FROM exercises WHERE id = ?
+  /**
+   * Deletes an exercise by its ID.
+   * @param {number} id - The ID of the exercise to delete.
+   * @returns {Promise<boolean>} True if deletion was successful, false otherwise.
+   */
+  deleteById: async (id) => {
+    // Note: If exercises are linked in workout_plan_exercises or workout_session_exercises
+    // with ON DELETE CASCADE, those links will be deleted too.
+    // If ON DELETE SET NULL was used, the foreign keys will become NULL.
+    const sql = 'DELETE FROM exercises WHERE id = ?';
+    try {
+      const [result] = await db.query(sql, [id]);
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error(`Error deleting exercise with id ${id}:`, error);
+      throw error;
+    }
   }
-  */
-
 };
 
-// Exportam modelul
 module.exports = Exercise;
+

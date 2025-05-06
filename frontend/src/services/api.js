@@ -60,6 +60,10 @@ export const registerUser = async (username, email, password, role = 'User') => 
 
 // --- Exercises ---
 export const getAllExercises = async () => { /* ... */ return apiRequest('/exercises', 'GET'); };
+export const getExerciseById = async (id) => { /* ... */ return apiRequest(`/exercises/${id}`, 'GET'); };
+export const createExercise = async (exerciseData) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest('/exercises', 'POST', exerciseData, token); };
+export const updateExercise = async (id, exerciseData) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest(`/exercises/${id}`, 'PUT', exerciseData, token); };
+export const deleteExercise = async (id) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest(`/exercises/${id}`, 'DELETE', null, token); };
 
 // --- Recipes ---
 export const getAllRecipes = async () => { /* ... */ return apiRequest('/recipes', 'GET'); };
@@ -76,54 +80,73 @@ export const logWorkout = async (workoutData) => { /* ... */ const token = local
 export const getWorkoutHistory = async (startDate, endDate) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } const queryParams = new URLSearchParams(); if (startDate) queryParams.set('startDate', startDate); if (endDate) queryParams.set('endDate', endDate); const queryString = queryParams.toString(); return apiRequest(`/workouts/history${queryString ? `?${queryString}` : ''}`, 'GET', null, token); };
 
 // --- Weight Logs ---
+export const addOrUpdateWeight = async (logDate, weight, unit) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } const body = { logDate, weight, unit }; return apiRequest('/weight', 'POST', body, token); };
+export const getWeightHistory = async () => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest('/weight/history', 'GET', null, token); };
+export const deleteWeightLog = async (logId) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/weight/${logId}`, 'DELETE', null, token); };
+
+// --- Meal Logs ---
+export const addMealLogEntry = async (mealLogData) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest('/meals', 'POST', mealLogData, token); };
+export const getMealHistory = async (startDate, endDate) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } const queryParams = new URLSearchParams(); if (startDate) queryParams.set('startDate', startDate); if (endDate) queryParams.set('endDate', endDate); const queryString = queryParams.toString(); return apiRequest(`/meals/history${queryString ? `?${queryString}` : ''}`, 'GET', null, token); };
+export const deleteMealLogEntry = async (logId) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/meals/${logId}`, 'DELETE', null, token); };
+
+// --- Workout Plans ---
+export const getAllWorkoutPlans = async () => { /* ... */ return apiRequest('/plans', 'GET'); };
+export const getWorkoutPlanById = async (planId) => { /* ... */ return apiRequest(`/plans/${planId}`, 'GET'); };
+export const createWorkoutPlan = async (planData) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest('/plans', 'POST', planData, token); };
+export const updateWorkoutPlan = async (planId, planData) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/plans/${planId}`, 'PUT', planData, token); };
+export const deleteWorkoutPlan = async (planId) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/plans/${planId}`, 'DELETE', null, token); };
+
+// --- User Management (Admin) ---
+export const adminGetAllUsers = async () => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest('/users', 'GET', null, token); };
+export const adminUpdateUser = async (userId, updateData) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest(`/users/${userId}`, 'PUT', updateData, token); };
+export const adminDeleteUser = async (userId) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest(`/users/${userId}`, 'DELETE', null, token); };
+
+// --- Dashboard ---
+export const getRecentActivity = async (limit = 5) => { /* ... */ const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/dashboard/recent-activity?limit=${limit}`, 'GET', null, token); };
 
 /**
- * Adds or updates a weight log entry for the authenticated user.
- * @param {string} logDate - The date of the log (YYYY-MM-DD).
- * @param {number} weight - The weight value.
- * @param {string} unit - The unit of the weight ('kg' or 'lbs').
- * @returns {Promise<object>} A promise resolving to the backend response (likely includes the saved log).
+ * Fetches the nutritional, step, and water summary for today. Requires authentication.
+ * @returns {Promise<object>} Summary object { calories, protein, carbs, fat, steps, waterMl, goals: {...} }.
  */
-export const addOrUpdateWeight = async (logDate, weight, unit) => {
-    console.log(`Calling addOrUpdateWeight service function for date: ${logDate}`);
+export const getTodaySummary = async () => {
+    console.log("Calling getTodaySummary service function");
     const token = localStorage.getItem('authToken');
     if (!token) {
         return Promise.reject(new Error("Authentication token not found. Please log in."));
     }
-    const body = { logDate, weight, unit };
-    // The endpoint is POST /api/weight
-    return apiRequest('/weight', 'POST', body, token);
+    // Endpoint: GET /api/dashboard/today-summary
+    return apiRequest('/dashboard/today-summary', 'GET', null, token);
 };
 
+// --- Step Logs ---
 /**
- * Fetches the weight log history for the authenticated user.
- * @returns {Promise<Array>} A promise resolving to an array of weight log objects (weight is in kg).
+ * Adjusts today's step count for the authenticated user.
+ * @param {number} amount - The number of steps to add (can be negative).
+ * @returns {Promise<object>} The API response (likely includes the updated log).
  */
-export const getWeightHistory = async () => {
-    console.log("Calling getWeightHistory service function");
+export const adjustTodaySteps = async (amount) => {
+    console.log(`Calling adjustTodaySteps service function with amount: ${amount}`);
     const token = localStorage.getItem('authToken');
     if (!token) {
         return Promise.reject(new Error("Authentication token not found. Please log in."));
     }
-    // The endpoint is GET /api/weight/history
-    return apiRequest('/weight/history', 'GET', null, token);
+    // Endpoint: POST /api/steps/adjust
+    return apiRequest('/steps/adjust', 'POST', { amount }, token);
 };
 
+// --- Water Logs ---
 /**
- * Deletes a specific weight log entry by its ID for the authenticated user.
- * @param {string|number} logId - The ID of the weight log entry to delete.
- * @returns {Promise<any>} A promise resolving (often null for 204 No Content or success message).
+ * Adjusts today's water intake for the authenticated user.
+ * @param {number} amountMl - The amount of water in ml to add (can be negative).
+ * @returns {Promise<object>} The API response (likely includes the updated log).
  */
-export const deleteWeightLog = async (logId) => {
-    console.log(`Calling deleteWeightLog service function for ID: ${logId}`);
+export const adjustTodayWater = async (amountMl) => {
+    console.log(`Calling adjustTodayWater service function with amountMl: ${amountMl}`);
     const token = localStorage.getItem('authToken');
     if (!token) {
         return Promise.reject(new Error("Authentication token not found. Please log in."));
     }
-    // The endpoint is DELETE /api/weight/:logId
-    return apiRequest(`/weight/${logId}`, 'DELETE', null, token);
+    // Endpoint: POST /api/water/adjust
+    return apiRequest('/water/adjust', 'POST', { amountMl }, token);
 };
-
-
-// --- Add other API service functions below (e.g., for plans) ---
 
