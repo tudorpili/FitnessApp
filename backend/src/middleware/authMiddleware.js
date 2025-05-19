@@ -25,16 +25,16 @@ const authenticateToken = (req, res, next) => {
       return res.status(403).json({ message: 'Access denied. Invalid or expired token.' });
     }
 
-    // --- IMPORTANT: Ensure 'role' is included in your JWT payload during login ---
+    
     const userInfo = {
-        id: decodedPayload.userId, // Or decodedPayload.id
-        role: decodedPayload.role  // Make sure 'role' exists in the token payload
+        id: decodedPayload.userId, 
+        role: decodedPayload.role  
     };
 
     if (!userInfo.role) {
         console.warn('[AuthMiddleware] Token verified, but user role not found in payload.');
-        // Decide how to handle this - forbid access or allow but controllers must check role
-        // return res.status(403).json({ message: 'Access denied. User role missing.' });
+        
+        
     }
 
 
@@ -44,15 +44,12 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-/**
- * Middleware to check if the authenticated user has the 'Admin' role.
- * Must run *after* authenticateToken.
- */
+
 const isAdmin = (req, res, next) => {
-  // Check if req.user was attached by authenticateToken and has the Admin role
+  
   if (req.user && req.user.role === 'Admin') {
     console.log('[AuthMiddleware] Admin role verified.');
-    next(); // User is admin, proceed
+    next(); 
   } else {
     console.log(`[AuthMiddleware] Admin access denied. User role: ${req.user?.role}`);
     res.status(403).json({ message: 'Forbidden: Admin privileges required.' });
@@ -61,5 +58,5 @@ const isAdmin = (req, res, next) => {
 
 module.exports = {
   authenticateToken,
-  isAdmin // Export isAdmin
+  isAdmin 
 };

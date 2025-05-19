@@ -1,13 +1,9 @@
 // src/controllers/waterLogController.js
 const WaterLog = require('../models/WaterLog');
-const getDbTodayDate = require('../utils/dateUtils'); // Assuming you create this util
+const getDbTodayDate = require('../utils/dateUtils'); 
 
 const waterLogController = {
-  /**
-   * Handles POST request to adjust today's water intake.
-   * Expects { amountMl } in req.body.
-   * Requires user authentication.
-   */
+  
   adjustTodayWater: async (req, res) => {
     try {
       if (!req.user || !req.user.id) {

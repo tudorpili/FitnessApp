@@ -1,15 +1,8 @@
 // src/models/MealLog.js
-const db = require('../config/db'); // Adjust path if needed
+const db = require('../config/db'); 
 
 const MealLog = {
-  /**
-   * Adds a single food item log for a specific user, date, and meal type.
-   * @param {object} logData - Data for the meal log entry.
-   * Expected fields: userId, foodId (nullable), foodNameAtLogTime, logDate, mealType,
-   * quantityG, calories, proteinG, carbsG, fatG
-   * @returns {Promise<object>} A promise resolving to the created meal log entry.
-   * @throws {Error} Throws an error if the insertion fails.
-   */
+  
   addLogEntry: async (logData) => {
     const {
       userId, foodId, foodNameAtLogTime, logDate, mealType,
@@ -33,7 +26,7 @@ const MealLog = {
       if (!insertId) {
         throw new Error('Failed to create meal log entry.');
       }
-      // Fetch the newly created entry to return it
+      
       const [rows] = await db.query('SELECT * FROM meal_logs WHERE id = ?', [insertId]);
       return rows.length > 0 ? rows[0] : null;
     } catch (error) {
@@ -42,13 +35,7 @@ const MealLog = {
     }
   },
 
-  /**
-   * Finds meal log entries for a specific user, optionally filtered by date range.
-   * @param {number} userId - The ID of the user.
-   * @param {string} [startDate] - Optional start date (YYYY-MM-DD).
-   * @param {string} [endDate] - Optional end date (YYYY-MM-DD).
-   * @returns {Promise<Array>} A promise resolving to an array of meal log objects.
-   */
+  
   findUserMealLogs: async (userId, startDate, endDate) => {
     let sql = `
       SELECT
@@ -67,7 +54,7 @@ const MealLog = {
       sql += ' AND log_date <= ?';
       queryParams.push(endDate);
     }
-    sql += ' ORDER BY log_date DESC, created_at DESC'; // Order by date, then time logged
+    sql += ' ORDER BY log_date DESC, created_at DESC'; 
 
     try {
       const [rows] = await db.query(sql, queryParams);
@@ -78,12 +65,7 @@ const MealLog = {
     }
   },
 
-  /**
-   * Deletes a specific meal log entry by its ID.
-   * @param {number} logId - The ID of the meal log entry to delete.
-   * @param {number} userId - The ID of the user (for authorization check).
-   * @returns {Promise<boolean>} A promise resolving to true if deletion was successful, false otherwise.
-   */
+  
   deleteLogEntryById: async (logId, userId) => {
     const sql = 'DELETE FROM meal_logs WHERE id = ? AND user_id = ?';
     try {

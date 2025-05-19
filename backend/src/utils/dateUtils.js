@@ -1,9 +1,6 @@
 // src/utils/dateUtils.js
 
-/**
- * Gets today's date in YYYY-MM-DD format suitable for database queries.
- * @returns {string} Today's date string.
- */
+
 const getDbTodayDate = () => {
     const today = new Date();
     const year = today.getFullYear();

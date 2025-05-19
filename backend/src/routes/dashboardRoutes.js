@@ -7,13 +7,21 @@ const router = express.Router();
 
 // --- Protected Dashboard Routes ---
 
-// GET /api/dashboard/recent-activity - Fetch recent activity for the logged-in user
+// GET /api/dashboard/recent-activity - Fetch recent activity
 router.get('/recent-activity', authenticateToken, dashboardController.getRecentActivity);
 
-// GET /api/dashboard/today-summary - Fetch nutritional summary for today
-// --- FIX: Add this line ---
+// GET /api/dashboard/today-summary - Fetch today's summary
 router.get('/today-summary', authenticateToken, dashboardController.getTodaySummary);
 
-// Add other dashboard routes here later (e.g., /weight-trend)
+// GET /api/dashboard/weight-trend - Fetch weight data for chart
+router.get('/weight-trend', authenticateToken, dashboardController.getWeightTrend);
+
+// GET /api/dashboard/calorie-trend - Fetch calorie data for chart
+router.get('/calorie-trend', authenticateToken, dashboardController.getCalorieTrend);
+
+// --- NEW: Goals Progress Route ---
+// GET /api/dashboard/goals-progress - Fetch active goals with current progress
+router.get('/goals-progress', authenticateToken, dashboardController.getGoalsProgress);
+
 
 module.exports = router;

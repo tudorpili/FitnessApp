@@ -1,20 +1,16 @@
 // src/controllers/stepLogController.js
 const StepLog = require('../models/StepLog');
-const getDbTodayDate = require('../utils/dateUtils'); // Assuming you create this util
+const getDbTodayDate = require('../utils/dateUtils'); 
 
 const stepLogController = {
-  /**
-   * Handles POST request to adjust today's step count.
-   * Expects { amount } in req.body.
-   * Requires user authentication.
-   */
+  
   adjustTodaySteps: async (req, res) => {
     try {
       if (!req.user || !req.user.id) {
         return res.status(401).json({ message: 'User not authenticated.' });
       }
       const userId = req.user.id;
-      const todayDate = getDbTodayDate(); // Use consistent date format
+      const todayDate = getDbTodayDate(); 
 
       const { amount } = req.body;
       const adjustmentAmount = parseInt(amount, 10);
