@@ -26,6 +26,7 @@ import RecipesPage from './pages/RecipesPage.jsx';
 import RecipeDetailPage from './pages/RecipeDetailPage.jsx';
 import AdminUsersPage from './pages/AdminUsersPage.jsx';
 import AdminExercisesPage from './pages/AdminExercisesPage.jsx';
+import GoalsPage from './pages/GoalsPage.jsx';
 
 const NotFoundPage = () => <div className="p-4">404 - Page Not Found</div>;
 
@@ -48,6 +49,7 @@ function App() {
           <Route path="/workout-plans" element={<WorkoutPlansPage />} />
           <Route path="/calculators" element={<CalculatorsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/goals" element={<GoalsPage />} />
         </Route>
       </Route>
 
