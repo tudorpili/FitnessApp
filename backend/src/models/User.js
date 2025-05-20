@@ -5,26 +5,20 @@ const bcrypt = require('bcrypt');
 const SALT_ROUNDS = 10; 
 
 const User = {
-  
+  // --- create, findByEmail, findById, comparePassword, findAllAdminView, updateById (for admin), deleteById (for admin) remain the same as in artifact settings_page_functional ---
   create: async (userData) => {
     const { username, email, password, role } = userData;
     try {
-      
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
       const sql = 'INSERT INTO users (username, email, password_hash, role) VALUES (?, ?, ?, ?)';
-      
       const userRole = (role === 'Admin' || role === 'User') ? role : 'User';
       const [result] = await db.query(sql, [username, email, hashedPassword, userRole]);
       const insertId = result.insertId;
-
-      
       const [rows] = await db.query('SELECT id, username, email, role, status, created_at FROM users WHERE id = ?', [insertId]);
       return rows.length > 0 ? rows[0] : null;
-
     } catch (error) {
       console.error('Error creating user:', error);
       if (error.code === 'ER_DUP_ENTRY') {
-        
         if (error.message.includes('username')) {
           throw new Error(`Username "${username}" already exists.`);
         } else if (error.message.includes('email')) {
@@ -35,7 +29,6 @@ const User = {
     }
   },
 
-  
   findByEmail: async (email) => {
     const sql = 'SELECT * FROM users WHERE email = ?';
     try {
@@ -47,8 +40,7 @@ const User = {
     }
   },
 
-  
-   findById: async (id) => {
+  findById: async (id) => {
     const sql = 'SELECT id, username, email, role, status, created_at FROM users WHERE id = ?';
     try {
       const [rows] = await db.query(sql, [id]);
@@ -59,8 +51,6 @@ const User = {
     }
   },
 
-
-  
   comparePassword: async (plainPassword, hashedPassword) => {
     try {
       return await bcrypt.compare(plainPassword, hashedPassword);
@@ -70,11 +60,7 @@ const User = {
     }
   },
 
-  
-
-  
   findAllAdminView: async () => {
-    
     const sql = `
         SELECT id, username, email, role, status, created_at, updated_at
         FROM users
@@ -89,25 +75,20 @@ const User = {
     }
   },
 
-  
   updateById: async (id, updateData) => {
-    
     const allowedFields = ['username', 'email', 'role', 'status'];
     const fieldsToUpdate = {};
     let sql = 'UPDATE users SET ';
     const values = [];
 
-    
     allowedFields.forEach(field => {
         if (updateData[field] !== undefined) {
-            
             if (field === 'role' && !['User', 'Admin'].includes(updateData[field])) {
                  throw new Error(`Invalid role specified: ${updateData[field]}`);
             }
             if (field === 'status' && !['Active', 'Inactive'].includes(updateData[field])) {
                  throw new Error(`Invalid status specified: ${updateData[field]}`);
             }
-
             if (values.length > 0) sql += ', ';
             sql += `${field} = ?`;
             values.push(updateData[field]);
@@ -115,13 +96,12 @@ const User = {
         }
     });
 
-    
     if (values.length === 0) {
         console.warn('User update called with no valid fields to update.');
         return User.findById(id); 
     }
 
-    sql += ' WHERE id = ?';
+    sql += ', updated_at = CURRENT_TIMESTAMP WHERE id = ?'; // Ensure updated_at is set
     values.push(id);
 
     try {
@@ -129,21 +109,18 @@ const User = {
         if (result.affectedRows === 0) {
             return null; 
         }
-        
         return await User.findById(id);
     } catch (error) {
         console.error(`Error updating user with id ${id}:`, error);
          if (error.code === 'ER_DUP_ENTRY') {
-            if (error.message.includes('username')) throw new Error(`Username "${updateData.username}" already exists.`);
-            if (error.message.includes('email')) throw new Error(`Email "${updateData.email}" already exists.`);
+            if (error.message.includes('username') && updateData.username) throw new Error(`Username "${updateData.username}" already exists.`);
+            if (error.message.includes('email') && updateData.email) throw new Error(`Email "${updateData.email}" already exists.`);
          }
         throw error;
     }
   },
 
-  
   deleteById: async (id) => {
-    
     const sql = 'DELETE FROM users WHERE id = ?';
     try {
       const [result] = await db.query(sql, [id]);
@@ -152,8 +129,62 @@ const User = {
       console.error(`Error deleting user with id ${id}:`, error);
       throw error;
     }
-  }
+  },
 
+  // --- NEW: Method for user to update their own profile (e.g., username) ---
+  updateMyProfile: async (userId, profileData) => {
+    const { username } = profileData; // For now, only allow username update by user
+
+    if (!username || !username.trim()) {
+        throw new Error('Username cannot be empty.');
+    }
+
+    const sql = 'UPDATE users SET username = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
+    try {
+        const [result] = await db.query(sql, [username.trim(), userId]);
+        if (result.affectedRows === 0) {
+            return null; // User not found or no change made
+        }
+        return await User.findById(userId); // Return updated user details (excluding password hash)
+    } catch (error) {
+        console.error(`Error updating profile for user ID ${userId}:`, error);
+        if (error.code === 'ER_DUP_ENTRY' && error.message.includes('username')) {
+            throw new Error(`Username "${username}" already exists.`);
+        }
+        throw error;
+    }
+  },
+
+  // --- NEW: Method for user to change their password ---
+  changePassword: async (userId, currentPassword, newPassword) => {
+    if (!currentPassword || !newPassword) {
+        throw new Error('Current password and new password are required.');
+    }
+    if (newPassword.length < 6) {
+        throw new Error('New password must be at least 6 characters long.');
+    }
+
+    try {
+        const user = await User.findByEmail((await User.findById(userId)).email); // Fetch full user details including password_hash
+        if (!user) {
+            throw new Error('User not found.');
+        }
+
+        const isMatch = await User.comparePassword(currentPassword, user.password_hash);
+        if (!isMatch) {
+            throw new Error('Incorrect current password.');
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+        const sql = 'UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
+        const [result] = await db.query(sql, [hashedNewPassword, userId]);
+
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error(`Error changing password for user ID ${userId}:`, error);
+        throw error; // Re-throw specific errors like "Incorrect current password"
+    }
+  }
 };
 
 module.exports = User;

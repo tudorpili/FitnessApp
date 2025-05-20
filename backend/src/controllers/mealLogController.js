@@ -148,6 +148,8 @@ const mealLogController = {
       res.status(500).json({ message: 'Error deleting meal log entry', error: error.message });
     }
   }
+
+  
 };
 
 module.exports = mealLogController;
