@@ -62,4 +62,4 @@ Focusul Aplicației: Ce vrei să fie punctul forte al aplicației tale?
 sa pun greutatea si nr de reps
 2.Sa pot vedea progresul in functie de exercitiu
 3. Sa adaug likeuri la recipes
-4.
+4. Profil utilizatori si componenta de social
