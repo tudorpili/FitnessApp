@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const SALT_ROUNDS = 10; 
 
 const User = {
-  // --- create, findByEmail, findById, comparePassword, findAllAdminView, updateById (for admin), deleteById (for admin) remain the same as in artifact settings_page_functional ---
   create: async (userData) => {
     const { username, email, password, role } = userData;
     try {
@@ -77,9 +76,9 @@ const User = {
 
   updateById: async (id, updateData) => {
     const allowedFields = ['username', 'email', 'role', 'status'];
-    const fieldsToUpdate = {};
     let sql = 'UPDATE users SET ';
     const values = [];
+    let setClauses = [];
 
     allowedFields.forEach(field => {
         if (updateData[field] !== undefined) {
@@ -89,19 +88,18 @@ const User = {
             if (field === 'status' && !['Active', 'Inactive'].includes(updateData[field])) {
                  throw new Error(`Invalid status specified: ${updateData[field]}`);
             }
-            if (values.length > 0) sql += ', ';
-            sql += `${field} = ?`;
+            setClauses.push(`${field} = ?`);
             values.push(updateData[field]);
-            fieldsToUpdate[field] = updateData[field]; 
         }
     });
 
-    if (values.length === 0) {
+    if (setClauses.length === 0) {
         console.warn('User update called with no valid fields to update.');
         return User.findById(id); 
     }
 
-    sql += ', updated_at = CURRENT_TIMESTAMP WHERE id = ?'; // Ensure updated_at is set
+    sql += setClauses.join(', ');
+    sql += ', updated_at = CURRENT_TIMESTAMP WHERE id = ?';
     values.push(id);
 
     try {
@@ -131,21 +129,18 @@ const User = {
     }
   },
 
-  // --- NEW: Method for user to update their own profile (e.g., username) ---
   updateMyProfile: async (userId, profileData) => {
-    const { username } = profileData; // For now, only allow username update by user
-
+    const { username } = profileData; 
     if (!username || !username.trim()) {
         throw new Error('Username cannot be empty.');
     }
-
     const sql = 'UPDATE users SET username = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
     try {
         const [result] = await db.query(sql, [username.trim(), userId]);
         if (result.affectedRows === 0) {
-            return null; // User not found or no change made
+            return null; 
         }
-        return await User.findById(userId); // Return updated user details (excluding password hash)
+        return await User.findById(userId);
     } catch (error) {
         console.error(`Error updating profile for user ID ${userId}:`, error);
         if (error.code === 'ER_DUP_ENTRY' && error.message.includes('username')) {
@@ -155,7 +150,6 @@ const User = {
     }
   },
 
-  // --- NEW: Method for user to change their password ---
   changePassword: async (userId, currentPassword, newPassword) => {
     if (!currentPassword || !newPassword) {
         throw new Error('Current password and new password are required.');
@@ -163,28 +157,37 @@ const User = {
     if (newPassword.length < 6) {
         throw new Error('New password must be at least 6 characters long.');
     }
-
     try {
-        const user = await User.findByEmail((await User.findById(userId)).email); // Fetch full user details including password_hash
+        const user = await User.findByEmail((await User.findById(userId)).email); 
         if (!user) {
             throw new Error('User not found.');
         }
-
         const isMatch = await User.comparePassword(currentPassword, user.password_hash);
         if (!isMatch) {
             throw new Error('Incorrect current password.');
         }
-
         const hashedNewPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
         const sql = 'UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
         const [result] = await db.query(sql, [hashedNewPassword, userId]);
-
         return result.affectedRows > 0;
     } catch (error) {
         console.error(`Error changing password for user ID ${userId}:`, error);
-        throw error; // Re-throw specific errors like "Incorrect current password"
+        throw error;
+    }
+  },
+
+  // --- NEW: Method to deactivate a user's account ---
+  deactivateAccount: async (userId) => {
+    const sql = "UPDATE users SET status = 'Inactive', updated_at = CURRENT_TIMESTAMP WHERE id = ?";
+    try {
+        const [result] = await db.query(sql, [userId]);
+        return result.affectedRows > 0;
+    } catch (error) {
+        console.error(`Error deactivating account for user ID ${userId}:`, error);
+        throw error;
     }
   }
+  // --- END NEW ---
 };
 
 module.exports = User;

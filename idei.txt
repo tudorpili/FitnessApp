@@ -55,3 +55,11 @@ Cum să alegi:
 Feedback Utilizatori (Chiar dacă ești tu): Ce funcționalități ți-ai dori cel mai mult ca utilizator?
 Complexitate vs. Valoare: Unele funcționalități sunt mai ușor de implementat decât altele. Alege un echilibru între efort și beneficiul adus.
 Focusul Aplicației: Ce vrei să fie punctul forte al aplicației tale?
+
+
+
+1.Sa fac sa poata adauga oricine workout plans si sa fie personalizate si sa pot sa dau import la workout plans in log workout pentru a mi se adauga automat exercitiile si eu doar
+sa pun greutatea si nr de reps
+2.Sa pot vedea progresul in functie de exercitiu
+3. Sa adaug likeuri la recipes
+4.

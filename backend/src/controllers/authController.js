@@ -88,6 +88,11 @@ const login = async (req, res, next) => {
             return res.status(401).json({ message: 'Invalid credentials.' }); 
         }
 
+        if (user.status === 'Inactive') {
+            console.log(`[AuthController] Login failed: Account for email ${email} is inactive.`);
+            return res.status(403).json({ message: 'Your account is inactive. Please contact an administrator.' });
+        }
+
         
         const isMatch = await User.comparePassword(password, user.password_hash);
 
