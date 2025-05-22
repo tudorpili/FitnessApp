@@ -62,8 +62,21 @@ export const getExerciseById = async (id) => { return apiRequest(`/exercises/${i
 export const createExercise = async (exerciseData) => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest('/exercises', 'POST', exerciseData, token); };
 export const updateExercise = async (id, exerciseData) => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest(`/exercises/${id}`, 'PUT', exerciseData, token); };
 export const deleteExercise = async (id) => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest(`/exercises/${id}`, 'DELETE', null, token); };
-export const getAllRecipes = async () => { const token = localStorage.getItem('authToken'); return apiRequest('/recipes', 'GET', null, token); }; // Token is optional here, handled by backend
-export const getRecipeById = async (id) => { const token = localStorage.getItem('authToken'); return apiRequest(`/recipes/${id}`, 'GET', null, token); }; // Token is optional
+
+// --- NEW: Get Exercise Progress Data ---
+export const getExerciseProgressData = async (exerciseId, metric = 'max_weight', startDate = null, endDate = null) => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return Promise.reject(new Error("Authentication token not found."));
+    const queryParams = new URLSearchParams({ metric });
+    if (startDate) queryParams.set('startDate', startDate);
+    if (endDate) queryParams.set('endDate', endDate);
+    const queryString = queryParams.toString();
+    return apiRequest(`/exercises/${exerciseId}/progress?${queryString}`, 'GET', null, token);
+};
+// --- END NEW ---
+
+export const getAllRecipes = async () => { const token = localStorage.getItem('authToken'); return apiRequest('/recipes', 'GET', null, token); };
+export const getRecipeById = async (id) => { const token = localStorage.getItem('authToken'); return apiRequest(`/recipes/${id}`, 'GET', null, token); };
 export const createRecipe = async (recipeData) => { const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest('/recipes', 'POST', recipeData, token); };
 export const updateRecipe = async (id, recipeData) => { const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/recipes/${id}`, 'PUT', recipeData, token); };
 export const deleteRecipe = async (id) => { const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/recipes/${id}`, 'DELETE', null, token); };
@@ -80,37 +93,14 @@ export const addMealLogEntry = async (mealLogData) => { const token = localStora
 export const getMealHistory = async (startDate, endDate) => { const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } const queryParams = new URLSearchParams(); if (startDate) queryParams.set('startDate', startDate); if (endDate) queryParams.set('endDate', endDate); const queryString = queryParams.toString(); return apiRequest(`/meals/history${queryString ? `?${queryString}` : ''}`, 'GET', null, token); };
 export const deleteMealLogEntry = async (logId) => { const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/meals/${logId}`, 'DELETE', null, token); };
 export const exportMealsData = async () => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest('/meals/export', 'GET', null, token); };
-
-// --- Workout Plans ---
-export const getAllWorkoutPlans = async (sortBy = 'created_at', sortOrder = 'DESC') => {
-    const token = localStorage.getItem('authToken'); // Optional token
-    const queryParams = new URLSearchParams({ sortBy, sortOrder });
-    return apiRequest(`/plans?${queryParams.toString()}`, 'GET', null, token);
-};
-export const getWorkoutPlanById = async (planId) => {
-    const token = localStorage.getItem('authToken'); // Optional token
-    return apiRequest(`/plans/${planId}`, 'GET', null, token);
-};
+export const getAllWorkoutPlans = async (sortBy = 'created_at', sortOrder = 'DESC') => { const token = localStorage.getItem('authToken'); const queryParams = new URLSearchParams({ sortBy, sortOrder }); return apiRequest(`/plans?${queryParams.toString()}`, 'GET', null, token);};
+export const getWorkoutPlanById = async (planId) => { const token = localStorage.getItem('authToken'); return apiRequest(`/plans/${planId}`, 'GET', null, token);};
 export const createWorkoutPlan = async (planData) => { const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest('/plans', 'POST', planData, token); };
 export const updateWorkoutPlan = async (planId, planData) => { const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/plans/${planId}`, 'PUT', planData, token); };
 export const deleteWorkoutPlan = async (planId) => { const token = localStorage.getItem('authToken'); if (!token) { return Promise.reject(new Error("Authentication token not found. Please log in.")); } return apiRequest(`/plans/${planId}`, 'DELETE', null, token); };
-export const adminUpdateWorkoutPlanStatus = async (planId, status) => {
-    const token = localStorage.getItem('authToken');
-    if (!token) return Promise.reject(new Error("Authentication token not found. Admin privileges required."));
-    return apiRequest(`/plans/${planId}/status`, 'PUT', { status }, token);
-};
-export const likeWorkoutPlan = async (planId) => {
-    const token = localStorage.getItem('authToken');
-    if (!token) return Promise.reject(new Error("Authentication token not found. Please log in."));
-    return apiRequest(`/plans/${planId}/like`, 'POST', null, token);
-};
-export const unlikeWorkoutPlan = async (planId) => {
-    const token = localStorage.getItem('authToken');
-    if (!token) return Promise.reject(new Error("Authentication token not found. Please log in."));
-    return apiRequest(`/plans/${planId}/like`, 'DELETE', null, token); // Backend uses DELETE for unlike
-};
-// --- End Workout Plans ---
-
+export const adminUpdateWorkoutPlanStatus = async (planId, status) => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found. Admin privileges required.")); return apiRequest(`/plans/${planId}/status`, 'PUT', { status }, token);};
+export const likeWorkoutPlan = async (planId) => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found. Please log in.")); return apiRequest(`/plans/${planId}/like`, 'POST', null, token);};
+export const unlikeWorkoutPlan = async (planId) => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found. Please log in.")); return apiRequest(`/plans/${planId}/like`, 'DELETE', null, token);};
 export const adminGetAllUsers = async () => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest('/users', 'GET', null, token); };
 export const adminUpdateUser = async (userId, updateData) => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest(`/users/${userId}`, 'PUT', updateData, token); };
 export const adminDeleteUser = async (userId) => { const token = localStorage.getItem('authToken'); if (!token) return Promise.reject(new Error("Authentication token not found.")); return apiRequest(`/users/${userId}`, 'DELETE', null, token); };
